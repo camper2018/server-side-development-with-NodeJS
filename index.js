@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
           return;
         }
         res.statusCode = 200;
-        res.setHeader("ContentType", "test/html");
+        res.setHeader("ContentType", "text/html");
         // So this createReadStream method will read in the file from this filePath.
         // And then convert that into stream of bytes,
         // and then they will pipe this through to the response.
