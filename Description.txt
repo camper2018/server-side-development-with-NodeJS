@@ -1,0 +1,53 @@
+JavaScript, when it is first designed was meant to be a scripting language to be used within the browser.
+Now JavaScript has gone way beyond its original intention, and is being used for writing applications, both to be run using frameworks within the browser,
+and also to run applications on the server side.
+JavaScript originally was never designed with any common libraries.
+If you look at standard programming languages like C, C++, Java, and so on,
+they all have standard libraries that enable you to access the underlying hardware.
+And also provide a structured way of organization the application into multiple files and then combining them together when you create an application.
+JavaScript never had any of this support when it began.
+But of course, people understood the difficulties when you need to expand JavaScript beyond a single file which is used as a scripting language for the browser.
+Now, if you have a very large JavaScript application, it becomes cumbersome to write the entire code in one single file.
+And obviously you want the results to be able to break your application into multiple facts.
+Unlike traditional programming languages, JavaScript never had a way of distributing the code into multiple files and then combining them together.
+So this is where the CommonJS API came in to fill in this gap that fills in the needs for some common application.
+And this CommonJS format defines a module format that can be used for breaking up your JavaScript application into multiple files.
+Node adopts that CommonJS format for organizing our JavaScript application into multiple files.
+And within JavaScript, with the CommonJS format, each file becomes its own Node module.
+So within that file, the CommonJS specification provides a variable called the module variable which is a JavaScript object.
+And this gives you access to the current module definition within a file.
+And on this module object, you have the module.exports property which determines the export from the current module.
+So when you assign something to the module.exports property, then that becomes the exported value from the current module.
+So that when this module is imported into another file of our Node application, then whatever is exported from this module becomes available in the second application.
+When you need to import a module into another module, this is where the require function is used to import the module.
+Node modules can be of three kinds:
+1. We have file-based Node modules where we define the Node module within a file, within our application and we make use of it within our application.
+2. We have core Node modules that are already part of Node.
+The Node designers kept these core modules intentionally small so that Node can be kept small.
+And also provide sufficient functionality so that external module designers can add in their own functionality that can be leveraged when we developed Node applications.
+So the core modules include path, file system (fs), os, util, and a few others.
+3. Then we have external Node modules.
+These are third-party Node modules that are developed by Node developers, and then made available through the Node ecosystem.
+So these external Node modules can be install within our system using NPM.
+
+Package.json is a Menifest file for our app. It is a file that contains information about the files in our app i.e metadata eg: name, version, liscence, author, modules used etc
+With node, we have the option of using JavaScript or Typescript as a language.
+The documentation for node and also express, all use standard JavaScript as a default. So we will be using standard JavaScript in this course or ES2015 JavaScript in this course.
+If we prefer to use TypeScript, we can set up our node examples to write our application in TypeScript.
+But then we will have to transpile that code into JavaScript so that it can be run using Node.
+So we have to set up additional infrastructure in order to be able to use TypeScript.
+Asynchronous execution and Callbacks:
+Before we proceed on to talk about Node Modules and Callbacks, we need to understand two salient features about the JavaScript language itself.
+First and foremost, JavaScript supports what is called as first-class functions.
+Is that a function can be treated just like any other variable.
+And hence, functions can be passed around as parameters inside function calls to other functions.
+And that essentially allows us to send in functions as callback functions that can be called from another Node module in order to get some work accomplished.
+Then look at how this is very useful in supporting callbacks in Node.js
+The second aspect about JavaScript is the support for Closures.
+A function defined inside another function automatically gets access to the variables that are declared in the outer function. So even if the outer function is completed execution, when the inner function executes later the inner function will still have access to the values of the variables within that outer function.
+And this is again, very effectively used when we use Callbacks in Node applications.
+
+HTTP VERBS:
+Http is a client-server communication protocol.
+Get, Post, Put, Delete, Head, Options, Trace, Connect.
+
