@@ -108,3 +108,69 @@ b.Serving Static Files:
 2.Update index.js to include it.
 3.Start the server and interact with it and observe the behavior.
 4.Do a Git commit with the message "Express Serve Static Files".
+
+REST:
+Web Services are a way of designing systems to support interoperability among systems that are connected over a network like the internet as we see today.
+This is what we refer to as a service-oriented architecture.
+Now, what this means is that you provide a standardized way for two machines that are connected to the internet to be able to communicate with each other at the application layer level for web-based applications using open standards.
+Two common approaches that are used for supporting web services are:
+1. SOAP: The Simple Object Access Protocol based web services which uses the web services description language for specifying how the two endpoints communicate with each other.
+Typically SOAP is based on using XML as the format for the messages being exchanged between the two endpoints.
+2.Representational State Transfer or REST also uses web standards, but the exchange of data between the two endpoints could be either XML or increasingly using JSON as the format.
+The REST way of interoperability is simpler compared to SOAP and hence, REST has found a lot wider deployment in the web services world.
+Typically, client-server communication is facilitated using REST where the server supports a REST API and the client can then invoke the REST API endpoints in order to obtain information or to upload information to the server.
+Within Representational State Transfer, there are four basic design principles:
+1. First and foremost, REST is built upon HTTP protocol, so it uses all the HTTP methods.
+2. Second, REST is designed to be stateless, meaning that the server doesn't store any information about the state after the communication is completed.
+3. Third, the REST way of providing resources is to expose a directory structure like URLs (Uniform Resource Locators - URLs).
+4. Fourth, the format for data exchange is typically JSON or XML or both can be supported using REST.
+In the REST world you often hear people talking about nouns, verbs, and representations.
+1. Nouns specifically refer to resources and these resources are usually identified by their URLs and these are unconstrained.
+  Now, these resources can be organized into a hierarchy of the specification of this URI.
+  So, as we traverse the path, we go from the more general to the more specific of the resource.
+  This directory structure enables you to identify the resources that you use or provide from your server-side very easily.
+2. Verbs are constraint and these specify the actions to be done on the resources.
+   GET, POST, PUT and DELETE, are mapped into the four CRUD operations that we can carry out on a database that stores these resources on the server-side,
+   the READ, CREATE, UPDATE, and DELETE operations.
+3. Representsation is, when the information needs to be conveyed from the server to the client or from the client to the server, how you encode the information.
+  Typically, either using JSON or using XML.
+
+DELETE operation would be idempotent because if you try to delete a resource and the resource exists, it will be deleted.
+If you are trying to delete a non-existing resource, it won't cause any further modification to the server-side, except that the server will reply with an error saying that the resource doesn't exist.
+Similarly, the GET operation is also an idempotent operation because it is not making any modifications to the resource on the server-side.
+POST and PUT of course are going to modify the resource on the server-side, either create a new resource or modify an existing resource on the server-side.
+Each endpoint is identified by a URI, and we can specify the various operations to be done on each endpoint using the appropriate HTTP verb, the GET, PUT, POST, or DELETE.
+The last part that we need to emphasize is that server-side should be completely stateless,
+which means that the server-side does not track the client state because if the server needs to track the clients state, it will not be scalable.
+So, for a scalable implementation of the server-side, you normally use a stateless server on the server-side.
+So, every request that the client sends to the server will be treated as an independent request and will not reflect upon previous requests that have already been handled by the server from that particular client.
+So, it's the responsibility of the client to track its own state, either in the form of using cookies or using a client-side database, whatever means that is suitable.
+Now, this approach where the client tracks its own state is a lot more scalable because each individual client will be responsible for tracking its own state.
+This is where the client-side MVC setup helps us in this regard.
+
+EXPRESS ROUTER:
+If you are implementing an Express application which supports multiple REST API endpoints,
+then it makes sense to subdivide the code into multiple modules and then make use of them to construct the overall Express application.
+So this where the Express router comes to our aid.
+Express router enables us to subdivide our application and organize it into multiple mini Express-like applications, which combine together to form the Express application.
+An Express router defines many Express application, and within that many Express application,
+you can, for example, deal with one particular REST API endpoint in more detail, or one particular pattern of REST API endpoint in more detail.
+
+Exercise (Instructions): Express Router:
+In this exercise, we used the Express framework and Express router to build a server supporting a REST API.
+
+Setting up a REST API:
+1.You will continue in the node-express folder and modify the server in this exercise.
+2.Install body-parser by typing the following at the command prompt:
+     npm install body-parser@1.18.3 --save
+3.Update index.js to add /dishes and /dishes:dishId REST api endpoints.
+4.Start the server and interact with it from the browser/postman.
+5.Do a Git commit with the message "Express Simple REST Api".
+
+Using Express Router:
+1.Create a new folder named routes in the node-express folder.
+2.Create a new file named dishRouter.js in the routes folder and add the code to implement /dishes route.
+3.Update index.js to use dishesRouter module within the main express app.
+4.Start the server and interact with it and see the result.
+5.Do a Git commit with the message "Express Router".
+
