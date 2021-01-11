@@ -6,7 +6,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const dishRouter = express.Router();
-// dishRouter is a mini express application/ module that can be imported into our index.js file
+// dishRouter is a mini express application/ module that can be imported into our index.js file.
+// A Router instance is a complete middleware
 dishRouter.use(bodyParser.json());
 // So in our index.js file, we will mount this express router at the /dishes endpoint.
 dishRouter
@@ -44,6 +45,28 @@ dishRouter
     // will receive req processed by next() method in app.all().
     res.end("Deleting all the dishes!");
     // This will send all dishes from mongodb database.
+  });
+
+dishRouter
+  .route("/:dishId")
+  .get((req, res, next) => {
+    res.end("Will send details of the dish: " + req.params.dishId + " to you!");
+  })
+  .post((req, res, next) => {
+    res.statusCode = 403;
+    res.end("POST operation not supported on /dishes/" + req.params.dishId);
+  })
+  .put((req, res, next) => {
+    res.write("Updating the dish: " + req.params.dishId + "\n");
+    res.end(
+      "Will update the dish: " +
+        req.body.name +
+        " with details: " +
+        req.body.description
+    );
+  })
+  .delete((req, res, next) => {
+    res.end("Deleting dish! " + req.params.dishId);
   });
 
 module.exports = dishRouter;
