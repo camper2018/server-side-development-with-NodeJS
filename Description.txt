@@ -215,3 +215,45 @@ To do this, you need to complete the following:
 
 Create a Node module named leaderRouter.js that implements the Express router for the /leaders  and /leaders/:leaderId REST API end points.
 Require the Node module you create above within your Express application and mount it on the /leaders route.
+
+Express Generator:
+Express Generator is a quick scaffolding tool that will help us to quickly build up the structure for an Express application with some starting code already built and some standard middleware already included into the application.
+And so all that we need to do is install the Express Generator via Command line interface as a global NPM module, and then use that to scaffold out our Express application.
+sudo npm install express-generator -g
+moved into the node-express folder
+Then type express <app-name> i.e express conFusionServer
+And this will generate a folder with the name of the application that you have typed in.
+There are various options available for you to generate your Express application.
+It can use different kinds of view generators like jade, EJS, and so on.
+In this course, we will be using Express purely as a server that supports REST API.
+And once you scaffold out your Express application, you just move into the application folder
+and do an npm install to install all the preconfigured modules that are already included in your default Express application.
+
+Exercise (Instructions): Express Generator:
+Objectives and Outcomes
+In this exercise, you will use the Express generator to scaffold out an Express application. Thereafter you will modify the application to support REST API making use of the Node modules that you developed as part of the first assignment. At the end of this exercise, you will be able to:
+
+Generating an Express application using the express-generator
+Modify the Express application to support the REST API by adding routes
+
+Installing express-generator
+1.Install express-generator by typing the following at the prompt:
+  sudo npm install express-generator@4.16.0 -g
+2.To scaffold out an Express application, type the following at the prompt:
+  express conFusionServer
+3.Next, move to the conFusionServer folder. Type the following at the command prompt to install all the Node modules:
+  npm install
+4.You can start the Express server by typing the following at the prompt:
+  npm start
+5.Add a file named .gitignore to the project folder and type the following into the file:
+  node_modules
+6.Initialize a Git repository and do a Git commit with the message "Express Generator".
+
+Implementing a REST API
+1. Now, copy the dishRouter.js, promoRouter.js and leaderRouter.js from your first assignment (node-express/routes folder) to the routes folder within the Express application that you just scaffolded out.
+2. Furthermore, copy the index.html and aboutus.html file from the node-express/public folder to the public folder in your new project.
+3. Then, open the app.js file and then update the code in there
+4. Save the changes and run the server. You can then test the server by sending requests and observing the behavior.
+5. Do a Git commit with the message "Express Generator REST API".
+
+
