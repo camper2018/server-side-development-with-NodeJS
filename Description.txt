@@ -343,3 +343,49 @@ A Simple Node-MongoDB Application
   npm start
 4.Add a .gitignore file with the contents "node_modules" in the project folder.
 5.Initialize the Git repository, check in all the files and do a Git commit with the message "Node MongoDB Example 1".
+
+Exercise (Instructions): Node and MongoDB Part 2
+Objectives and Outcomes
+In this exercise you will continue to explore communicating from our Node application to the MongoDB server.
+At the end of this exercise you will be able to:
+1.Develop your own Node module (file based module) containing some common MongoDB operations
+2.Use the Node module in your application and communicate with the MongoDB server
+
+Implementing a Node Module of Database Operations:
+1.Create a new file named operations.js that contains a few MongoDB operations and add the code
+
+Using the Node Module for Database Operations
+1.Update the file named index.js
+2/Run the server by typing the following at the prompt and observe the results:
+  npm start
+3.Do a Git commit with the message "Node MongoDB Example 2".
+Conclusions
+In this exercise you created a Node module to package some database operations,
+and then used the module to interact with the MongoDB server.
+
+Callback Hell and Promises:
+Heavily nested callback code, causes the Callback Hell problem and it results from our tendency to write programs top-down.
+We are still hung up with our sequential way of writing code and so we see it more convenient to write code top to bottom, and look at it as if it is executing in that order.
+Now we can work around the Callback Hell problem by not using anonymous functions for the callbacks but instead, declaring those functions with specific names, and then avoid the way we write the code as you saw here.
+That is one of the approaches that people take to deal with the Callback Hell problem.
+Another approach that is used to deal with for the Callback Hell problem,is the use of promises.
+
+A promise is a mechanism that supports asynchronous computation.
+So if you have amount of work that needs to be done, the promise acts as a proxy for a value which is not known at the moment but the promise is given to you.
+But when the value becomes available, it will be available in the future.
+So the promise represents a placeholder for that value.
+If the value results correctly, then your promise results correctly and you can have a piece of code executed in order to handle the fact that the promise resolved correctly,
+if not then you handle the error in that situation.
+So, a promise will resolve either into resolve or the rejection of the promise.
+
+The node MongoDB driver natively supports promises.
+So, if you do not specify a callback, the calls to their functions will return promises.
+So, we're going to update our application to make use of promises to avoid the callback hell issue
+Exercise (Instructions): Callback Hell and Promises:
+Objectives and Outcomes
+In this exercise you will learn to use promise support to update the Node application to avoid callback hell.
+Using Promises
+1.Update operations.js
+2.Next open index.js and update it
+3.Run the node application and see the result
+4.Do a Git commit with the message "Node Callback Hell and Promises".
