@@ -256,4 +256,90 @@ Implementing a REST API
 4. Save the changes and run the server. You can then test the server by sending requests and observing the behavior.
 5. Do a Git commit with the message "Express Generator REST API".
 
+MongoDB:
+The NoSQL databases themselves can be classified into four different categories:
+1.document based databases like MongoDB
+2. key value based databases like Redis
+3. column-family-based databases like Cassandra
+4. graph databases like Neo4J
+A document is a self-contained unit of information
+and can be in many different formats,
+JSON being one of the most popular formats for storing documents in a document database.
+Documents themselves can be organized into collections.
+So a collection is a group of documents and in turn, the database itself can be considered as a set of collections.
+The document in MongoDB is nothing but a JSON document.
+In fact, MongoDB stores the document in a more compact form called as the BSON format or binary JSON format.
+Every document in MongoDB database must have an ID field, an _id field, which acts as the primary key for the document.
+And this field is unique for each document.
+The ID field itself can be used in many formats and one particular format that MongoDB automatically assigns in case you don't choose to use your own ID field is the object ID that is created by default by MongoDB.
+The object ID field itself is a 12 byte field.
+The first four bytes includes a timestamp, the typical Unix timestamp in the resolution of a second.
+Then the next three bytes towards the machine ID, the machine on which the Mongo server is running.
+and the next two bytes is the process ID, the specific Mongo process which has created this document
+and then the last field is an increment(self-incrementing).
+When given an ID, you can easily retrieve information from this ID.
+For example, you can get hold of the ObjectID and then call the getTimestamp method of the object ID
+and this will return the timestamp in the ISO date format.
+So that will enable you to identify when this document has been created.
 
+Exercise (Instructions): Introduction to MongoDB:
+Objectives and Outcomes
+a.Download and Installing MongoDB
+b.Start the server and interact with it using the Mongo REPL shell
+
+1.Go to http://www.mongodb.org, then download and install MongoDB as per the instructions given there.
+2.Create a folder named mongodb on your computer and create a subfolder under it named data.
+3.Move to the mongodb folder and then start the MongoDB server by typing the following at the prompt:
+   mongod --dbpath=data --bind_ip 127.0.0.1
+   We created q data subfolder inside the mongodb folder.
+   So the dbpath here essentially takes the path to the folder, which will store the data for my Mongo application.
+   We can execute this mongod command from any location on our computer ss long as we specify the complete path to the location of the data folder where our MongoDB data is going to be stored.
+   Since we are running mongod server already in the mongodb folder, and the data folder is a sub-folder of the mongodb folder,
+   we can just simply execute the command by saying mongodb -- dbpath=data.
+
+4.Open another command window and then type the following at the command prompt to start the mongo REPL shell:
+   mongo
+5.The Mongo REPL shell(read evaluate print loop) will start running and give you a prompt to issue commands to the MongoDB server. At the Mongo REPL prompt, type the following commands one by one and see the resulting behavior:
+  db
+  use conFusion
+  db
+  db.help()
+6.You will now create a collection named dishes, and insert a new dish document in the collection:
+  db.dishes.insert({ name: "Uthappizza", description: "Test" });
+7.Then to print out the dishes in the collection, type:
+  db.dishes.find().pretty();
+8.Next, we will learn the information encoded into the ObjectId by typing the following at the prompt:
+  var id = new ObjectId();
+  id.getTimestamp();
+9.Type "exit" at the REPL prompt to exit the Mongo REPL.
+
+Node and MongoDB:
+Node MongoDB Driver module provides a high-level API that enables us to access the Mongo server from within our Node application.
+It provides you with many methods that enable you to interact with your Mongo server.
+It allows you to perform various database operations like inserting, deleting and updating an existing record or adding new records to your database.
+Also, it provides various ways of querying the documents that are already within the database.
+The driver itself supports both callback based and promise based interactions with the MongoDB server.
+
+Exercise (Instructions): Node and MongoDB Part 1:
+Objectives and Outcomes:
+In this exercise you will install the Node MongoDB driver module and configure your Node application to communicate with the MongoDB server. At the end of this exercise, you will be able to:
+
+Install and use the Node MongoDB driver
+Interact with the MongoDB database from a Node application
+
+Installing the Node MongoDB Driver Module
+1.Create a new folder named node-mongo and move into the folder.
+2.At the prompt, type the following to initialize a package.json file in the node-mongo folder:
+  npm init
+3.Accept the standard defaults suggested until you end up with a package.json file.
+4.Install the Node MongoDB driver and the Assert module by typing the following at the prompt:
+  npm install mongodb@3.0.10 --save
+  npm install assert@1.4.1 --save
+
+A Simple Node-MongoDB Application
+1.Create a new file named index.js and add code in it.
+2.Make sure that your MongoDB server is up and running
+3.Type the following at the prompt to start the server and see the result.
+  npm start
+4.Add a .gitignore file with the contents "node_modules" in the project folder.
+5.Initialize the Git repository, check in all the files and do a Git commit with the message "Node MongoDB Example 1".
