@@ -17,13 +17,32 @@ connect.then((db) => {
 
     .then((dish) => {
       console.log(dish);
-      return Dishes.find({}).exec();
+      return Dishes.findByIdAndUpdate(
+        dish._id,
+        {
+          $set: { description: "Updated test" },
+        },
+        {
+          // new: true means that once the update of the dish is complete,
+          // then this will return the updated dish back to us.
+          new: true,
+        }
+      ).exec();
       // The exec will ensure that this is executed and it will return a promise
     })
-    .then((dishes) => {
-      console.log(dishes);
-      return Dishes.remove({});
-      // return Dishes.deleteMany();
+    .then((dish) => {
+      console.log(dish);
+      dish.comments.push({
+        rating: 5,
+        comment: "I'm getting a sinking feeling!",
+        author: "Leonardo di Carpaccio",
+      });
+      return dish.save();
+    })
+    .then((dish) => {
+      console.log(dish);
+      // return Dishes.remove({});
+      return Dishes.deleteMany();
     })
     .then(() => {
       return mongoose.connection.close();
