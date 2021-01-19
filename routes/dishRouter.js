@@ -106,4 +106,203 @@ dishRouter
       .catch((err) => next(err));
   });
 
+dishRouter
+  .route("/:dishId/comments")
+  .get((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null) {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.json(dish.comments);
+          } else {
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  })
+  .post((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null) {
+            dish.comments.push(req.body);
+            dish.save().then(
+              (dish) => {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.json(dish);
+              },
+              (err) => next(err)
+            );
+          } else {
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  })
+  .put((req, res, next) => {
+    // will receive req processed by next() method in app.all().
+    res.statusCode = 403;
+    res.end(
+      "PUT operation not supported on /dishes" + req.params.dishId + "/comments"
+    );
+  })
+  .delete((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null) {
+            for (var i = dish.comments.length - 1; i >= 0; i--) {
+              // to access the subdocument/embeded document 'comments', we need to access each comment one by one by their ids
+              // and then perform remove operation on them.
+              dish.comments.id(dish.comments[i]._id).remove();
+            }
+            dish.save().then(
+              (dish) => {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.json(dish);
+              },
+              (err) => next(err)
+            );
+          } else {
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  });
+
+dishRouter
+  .route("/:dishId/comments/:commentId")
+  .get((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null && dish.comments.id(req.params.commentId) != null) {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            // the below line of code will allow us to retrieve a specific comment from the set of comments.
+            res.json(dish.comments.id(req.params.commentId));
+          } else if (dish == null) {
+            // requested dish doesn't exists
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          } else {
+            // requested comment doesn't exists
+            err = new Error("Comment " + req.params.commentId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  })
+  .post((req, res, next) => {
+    res.statusCode = 403;
+    res.end(
+      "POST operation not supported on /dishes/" +
+        req.params.dishId +
+        "/comments/" +
+        req.params.commentId
+    );
+  })
+  .put((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null && dish.comments.id(req.params.commentId) != null) {
+            if (req.body.rating) {
+              dish.comments.id(req.params.commentId).rating = req.body.rating;
+            }
+            if (req.body.comment) {
+              dish.comments.id(req.params.commentId).comment = req.body.comment;
+            }
+            dish.save().then(
+              (dish) => {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.json(dish);
+              },
+              (err) => next(err)
+            );
+          } else if (dish == null) {
+            // requested dish doesn't exists
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          } else {
+            // requested comment doesn't exists
+            err = new Error("Comment " + req.params.commentId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  })
+  .delete((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          if (dish != null && dish.comments.id(req.params.commentId) !== null) {
+            dish.comments.id(req.params.commentId).remove();
+            dish.save().then(
+              (dish) => {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.json(dish);
+              },
+              (err) => next(err)
+            );
+          } else if (dish == null) {
+            // requested dish doesn't exists
+            err = new Error("Dish " + req.params.dishId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          } else {
+            // requested comment doesn't exists
+            err = new Error("Comment " + req.params.commentId + " not found");
+            err.status = 404;
+            // This returned error with status 404 will be handled by our app.js file error handler.
+            // refer comment section (render the error page) in app.js file.
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  });
 module.exports = dishRouter;
