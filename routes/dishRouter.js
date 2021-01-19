@@ -5,6 +5,8 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const Dishes = require("../models/dishes");
 const dishRouter = express.Router();
 // dishRouter is a mini express application/ module that can be imported into our index.js file.
 // A Router instance is a complete middleware
@@ -12,29 +14,30 @@ dishRouter.use(bodyParser.json());
 // So in our index.js file, we will mount this express router at the /dishes endpoint.
 dishRouter
   .route("/")
-  .all((req, res, next) => {
-    // When we say app.all, no matter which method is invoked, get, put, post, or delete, for the /dishes REST API endpoint,
-    // this code will be executed first by default here.
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
-    // So when you call next, what it means is that it'll continue on to look for additional specifications that match the dishes endpoint.
-    // So this would be done for all the requests, get, put, post, and delete, on the dishes,
-    // and it'll continue on to the next one with /dishes endpoint as below.
-  })
   .get((req, res, next) => {
-    // will receive req processed by next() method in app.all().
-    res.end("Will send all the dishes to you!");
-    // This will send all dishes from mongodb database.
+    Dishes.find({})
+      .then(
+        (dishes) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(dishes);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   })
   .post((req, res, next) => {
-    // will receive req processed by next() method in app.all().
-    res.end(
-      "Will add the dish: " +
-        req.body.name +
-        " with details: " +
-        req.body.description
-    );
+    Dishes.create(req.body)
+      .then(
+        (dish) => {
+          console.log("Dish Created ", dish);
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(dish);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   })
   .put((req, res, next) => {
     // will receive req processed by next() method in app.all().
@@ -42,31 +45,65 @@ dishRouter
     res.end("PUT operation not supported on /dishes");
   })
   .delete((req, res, next) => {
-    // will receive req processed by next() method in app.all().
-    res.end("Deleting all the dishes!");
-    // This will send all dishes from mongodb database.
+    Dishes.remove({})
+      .then(
+        (resp) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(resp);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   });
 
 dishRouter
   .route("/:dishId")
   .get((req, res, next) => {
-    res.end("Will send details of the dish: " + req.params.dishId + " to you!");
+    Dishes.findById(req.params.dishId)
+      .then(
+        (dish) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(dish);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   })
   .post((req, res, next) => {
     res.statusCode = 403;
     res.end("POST operation not supported on /dishes/" + req.params.dishId);
   })
   .put((req, res, next) => {
-    res.write("Updating the dish: " + req.params.dishId + "\n");
-    res.end(
-      "Will update the dish: " +
-        req.body.name +
-        " with details: " +
-        req.body.description
-    );
+    Dishes.findByIdAndUpdate(
+      req.params.dishId,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
+      .then(
+        (dish) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(dish);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   })
   .delete((req, res, next) => {
-    res.end("Deleting dish! " + req.params.dishId);
+    Dishes.findByIdAndRemove(req.params.dishId)
+      .then(
+        (resp) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(resp);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   });
 
 module.exports = dishRouter;
