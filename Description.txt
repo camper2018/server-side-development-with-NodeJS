@@ -389,3 +389,167 @@ Using Promises
 2.Next open index.js and update it
 3.Run the node application and see the result
 4.Do a Git commit with the message "Node Callback Hell and Promises".
+
+Mongoose ODM
+We learned how the node MongoDB driver enables our node application to communicate with a MongoDB server.
+When the documents are stored in the database, the MongoDB driver itself imposes no structure on the documents.
+Any document can be stored in any collection.We can easily insert documents that don't necessarily comply with the structure.
+MongoDB relies on the developer to enforce the structure on the documents,
+and gives the complete responsibility to the developer to make sure that documents of the correct structure are added and maintained in the various collections.
+If we are very particular that the structure of the documents in a collection always have a specified structure, and always will have the specific set of fields,
+then the MongoDB itself doesn't impose that neither does the node MongoDB driver that we have seen in the previous lesson.
+his is where we will need a more formal way of imposing structure on the documents that are stored in a collection in a MongoDB database.
+his is where the Mongoose node module comes to our help.
+The Mongoose node module imposes a standardized structure for the documents that are stored in a particular collection.
+So, that is why we often hear people referring to this as the Mongoose ODM.
+The ODM itself is interpreted by some people to mean Object Data Model or sometimes referred to as Object Document Mapping, or some people refer to it as ORM or Object Relational Mapping.
+Now, when we talk about relational that applies a lot more to relational databases,
+but then with SQL databases we needed explicitly the object to relational mapping to be put in between the database and our application itself.
+Because within the application we would be looking at objects but their storage in an SQL database will be in the form of records, and so you need an explicit mapping.
+As we saw with the NoSQL database, this was not explicitly required.
+But if we need to impose structure on our documents that are stored in a collection then the use of Mongoose to impose this structure is very, very useful.
+The way Mongoose goes around imposing structure on the documents is through the use of schema.
+Mongoose schema, implies a structure on the data that is stored in a document in your database.
+So, it defines all the fields of our document, and also specifies the types of the fields,
+and also can provide us with additional features that can enable validation on these fields.
+So, for example, the various schema types that are supported in Mongoose include: String, Number, Date, Buffer, Boolean, Mixed, object ID, and Array.
+An array schema type would allow us to create an array of sub-documents inside the document.
+Once you define a schema, the schema is then used in Mongoose to create a model function, and that is what enables you to define the structure for your documents in the database.
+Schemas themselves can be nested to enable supporting embedded or subdocuments.
+The sub-documents typically are accommodated either through specifying an additional schema,
+and then defining one of the fields of the schema to be off the type of the other schema.
+Or you can even go with an array of another schema type within a second schema that you define.
+For example, if you define a schema earlier, so for example, you previously defined a commentSchema, now you can also define the comment field into another schema (e.g dishSchema) and then specify that that field will be of the type of the previous schema that you have defined i.e {coment: [commentSchema]} type.
+So, an array of comments that will be included in each dish document, thereby, you can have more than one comment sub-document enclosed inside a dish document.
+You can also define additinal field in your schema that is : timestamps: true
+The timestamps allow you to have two different fields in the document: the created_at field and the updated_at fields, both of which are timestamps stored in the form of an ISO date string in the document.
+Now, once we define the schema, to make use of this in our application, we need to create a model from that schema that we have just defined.
+e.g var Dishes = mongoose.model('Dish', dishSchema);
+we will define a Mongoose model and specify that the model is off the type dishSchema in this example.
+when you give a name to the model here, we are specifying the name as Dish.
+Now, when we use this dish model in our node application where we are making use of Mongoose, then this will be transformed and mapped into a collection in my MongoDB database i.e dishes
+So, Mongoose automatically knows that when you specify a name, it'll automatically construct the plural of that name and then give the collection the name, which is the plural of the model name that you specify.
+Mongoose also enables us to establish the connection with the MongoDB server.
+Mongoose internally make use of the MongoDB driver that we had used in the previous exercise.
+So, Mongoose depends upon the MongoDB driver,
+so, which means that from your Mongoose-based node application, you can use all the methods that are already available from the MongoDB driver also if you choose to,
+but Mongoose itself has its own collection of methods that we can make use of to interact with the MongoDB database.
+
+Exercise (Instructions): Mongoose ODM Part 1
+Objectives and Outcomes
+In this exercise you will explore the Mongoose ODM and learn about creating schemas and interacting with the MongoDB database using Mongoose methods. At the end of this exercise, you will be able to:
+
+Install Mongoose ODM and connect to a MongoDB Server
+Create Mongoose Schemas
+Perform Database operations with Mongoose methods
+
+Installing Mongoose:
+1.Create a folder named node-mongoose and move into the folder.
+2.At the prompt, type the following to initialize a package.json file in the node-mongoose folder:
+  npm init
+3.Accept the standard defaults suggested
+4.n this folder, install Mongoose by typing the following at the prompt:
+  npm install mongoose@5.1.7 --save
+
+Implementing a Node Application
+1.Create a sub-folder named models in the node-mongoose folder. Move to this folder.
+2.Create a file named dishes.js and add the following code to create a Mongoose schema
+3.Move to the node-mongoose folder and create a file named index.js and add the code:
+4.Make sure that your MongoDB server is up and running. Then at the terminal prompt type the following to start the server and see the result:
+  npm start
+5.Create a .gitignore file with the contents "node_modules"
+6.Initialize the Git repository and do a Git commit with the message "Mongoose Part 1".
+
+Exercise (Instructions): Mongoose ODM Part 2
+Objectives and Outcomes
+In this exercise you will continue to explore the Mongoose ODM and learn about creating schemas and interacting with the MongoDB database using Mongoose methods. At the end of this exercise, you will be able to:
+Perform Database operations with Mongoose methods
+Mongoose Operations
+1.Now, update index.js
+2.Run this server on the console and see the result.
+3.Do a Git commit with the message "Mongoose Part 2".
+
+Adding Sub-documents to a Document
+1.Update dishes.js in the models folder
+2.Update index.js
+3.Run the server and observe the result.
+4.Do a Git commit with the message "Mongoose Part 3".
+
+
+Exercise (Instructions): REST API with Express, MongoDB and Mongoose Part 1:
+
+Objectives and Outcomes:
+In this exercise, you will integrate the REST API server based on the Express framework that you implemented earlier, together with the Mongoose schema and models to create a full-fledged REST API server. At the end of this exercise, you will be able to:
+1.Develop a full-fledged REST API server with Express, MongoDB and Mongoose
+2.Serve up various REST API end points together with interaction with the MongoDB server.
+
+Update the Express Application:
+1.Go to the conFusionServer folder where you had developed the REST API server using Express generator.
+2.Copy the models folder from the node-mongoose folder to the conFusionServer folder.
+3.Then install bluebird, mongoose and mongoose-currency Node modules by typing the following at the prompt:
+  npm install mongoose@5.1.7 mongoose-currency@0.2.0 --save
+  The Mongoose currency adds in support for currency in our schema
+  Since our dish is going to contain a price, that is why we are going to be using the Mongoose currency module here
+4.Open app.js file and add in the code to connect to the MongoDB server
+5.Next open dishes.js in the models folder and update it
+6.Now open dishRouter.js and update its code
+7.Save the changes and start the server. Make sure your MongoDB server is up and running.
+8.You can now fire up postman and then perform several operations on the REST API. You can use the data for all the dishes provided in the db.json file given above in the Exercise Resources to test your server
+9.Do a Git commit with the message "Express REST API with MongoDB and Mongoose Part 1"
+
+Exercise (Instructions): REST API with Express, MongoDB and Mongoose Part 2:
+Objectives and Outcomes:
+In this exercise, you will continue the integration of the REST API server based on the Express framework that you implemented earlier, together with the Mongoose schema and models to create a full-fledged REST API server.
+At the end of this exercise, you will be able to:
+1.Add support for accessing and updating comments within the dishes.
+
+Handling Comments:
+1.Add the code to dishRouter.js to handle comments:
+2.Save the changes and start the server. Make sure your MongoDB server is up and running.
+3.You can now fire up postman and then perform several operations on the REST API. You can use the data for all the dishes provided in the db.json file given above in the Exercise Resources to test your server
+4.Do a Git commit with the message "Express REST API with MongoDB and Mongoose Part 2".
+
+Assignment 2 Instructions:
+In this assignment, you will continue your journey with MongoDB and Mongoose.
+You will then create two new schemas for promotions and leadership,
+and then extend the Express REST API server to support the /promotions and the /leaders REST API end points.
+
+Step-By-Step Assignment Instructions
+
+Assignment Overview:
+At the end of this assignment you would have completed the following three tasks:
+1.Implemented the Promotions schema and model
+2.Implement a REST API to support the /promotions endpoint, and the /promotions/:promoId endpoint enabling the interaction with the MongoDB database
+3.Implemented the Leaders schema and model
+4.Implement a REST API to support the /leaders endpoint, and the /leaders/:leaderId endpoint enabling the interaction with the MongoDB database
+
+Assignment Requirements:
+This assignment consists of the following two tasks:
+You are given the following example of a promotion document. You will now create the Promotions schema and model to support the document:
+{
+      "name": "Weekend Grand Buffet",
+      "image": "images/buffet.png",
+      "label": "New",
+      "price": "19.99",
+      "description": "Featuring . . .",
+      "featured": false
+}
+Note in particular that the label and price fields should be implemented the same way as you did for the Dishes schema and model. The Promotions schema and model should be defined in a file named promotions.js.
+Next, extend the promoRouter.js to enable the interaction with the MongoDB database to fetch, insert, update and delete information.
+
+Task 2:
+You are given the following example of a leadership document. You will now create the Leaders schema and model to support the document:
+
+{
+      "name": "Peter Pan",
+      "image": "images/alberto.png",
+      "designation": "Chief Epicurious Officer",
+      "abbr": "CEO",
+      "description": "Our CEO, Peter, . . .",
+      "featured": false
+}
+
+The Leaders schema and model should be defined in a file named leaders.js.
+Next, extend the leaderRouter.js to enable the interaction with the MongoDB database to fetch, insert, update and delete information.
+
+

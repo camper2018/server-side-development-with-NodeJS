@@ -13,3 +13,12 @@
 13.Node MongoDB Example 1 ---> See node-mongo branch
 14.Node MongoDB Example 2 ---> created file based node module that contains basic database operations.
 15.Node Callback Hell and Promises ----> replaced callbacks hell with promise
+16.Mongoose Part 1 ---> ORM for no sql databases.
+17.Mongoose Part 2 ---> Used create method for saving document in db.
+18.Mongoose Part 3 ----> Add commentSchema to the dishSchema
+19.Mongoose Part 1 -----> Implement a full-fledged REST API server with Express, Mongo and Mongoose with support for /dishes  and /dishes/:dishId end-points.
+   Part 1 of Express REST API with MongoDB and Mongoose Part 2
+20.Express REST API with MongoDB and Mongoose Part 2 ----> Add support for accessing and updating comments within the dishes.
+21.Assignment 2 -----> Add promotions and leaders REST API end-points.
+   Refer Description.txt for details
+
