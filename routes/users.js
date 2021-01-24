@@ -13,8 +13,10 @@ router.post("/signup", (req, res, next) => {
   User.findOne({ username: req.body.username })
     .then((user) => {
       if (user !== null) {
+        // then the user with that given username already exists,
+        // so you should not allow a duplicate signup
         var err = new Error("User " + req.body.username + " already exists");
-        err.status = 403;
+        err.status = 403; // forbidden
         next(err);
       } else {
         return User.create({
