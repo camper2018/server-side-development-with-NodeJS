@@ -3,7 +3,8 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
+var session = require("express-session");
+var FileStore = require("session-file-store")(session);
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
@@ -29,24 +30,23 @@ app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// We are going to modify authorization middleware to make use of cookies instead of the authorization header here.
-// middleware that sets up signed cookies with the secret string passed is used as a cookie signature.
-// The secret key is a key that can be used by our cookie-parser in order to encrypt the information
-// and sign the cookie that is sent from the server to the client.
-app.use(cookieParser("12345-67890-09876-54321"));
+// We are going to modify authorization middleware to make use of wessions instead of cookies .
+// app.use(cookieParser("12345-67890-09876-54321"));
+app.use(
+  session({
+    name: "session-id",
+    secret: "12345-67890-09876-54321",
+    saveUninitialized: false,
+    resave: false,
+    store: new FileStore(),
+  })
+  // file store keeps track of all of our sessions and creates a session folder in out project to store all sessions info.
+  // Server uses this info to cross-check and make sure that our client is an authorized client.
+);
 // auth middleware
 const auth = (req, res, next) => {
-  console.log(req.signedCookies);
-
-  // check that user property in the signed cookies doesn't exist,
-  // or even the signed cookie itself doesn't exist,
-  // Then, we will expect basic authorization to be done.
-
-  if (!req.signedCookies.user) {
-    // The header will have no authorization field when first request is received.
-    // We will set authorization header if it is not found so that subsequent requests contain this header.
-    // Also will send an error message to the client with status of Unauthorized.
-
+  console.log(req.session);
+  if (!req.session.user) {
     let authHeader = req.headers.authorization;
     if (!authHeader) {
       let err = new Error("You are not authenticated!");
@@ -59,13 +59,8 @@ const auth = (req, res, next) => {
       let [user, password] = new Buffer.from(authHeader.split(" ")[1], "base64")
         .toString()
         .split(":");
-      // here we split the authorization header at space that gives us ['Basic', 'base64 encoded string' ]
-      // We futher split base64 string at ':' to get [username, password]
       if (user === "admin" && password === "password") {
-        // If the authorization is successful,
-        // then we will set up the cookie by using the res.cookie here with user property set to a value of admin.
-        res.cookie("user", "admin", { signed: true });
-        // if authentication is successful, we will send the request object to be handled by subsequent middlewares.
+        req.session.user = "admin";
         next();
       } else {
         let err = new Error("You are not authenticated!");
@@ -75,14 +70,10 @@ const auth = (req, res, next) => {
       }
     }
   } else {
-    // Then, all subsequent requests will carry the signed cookie anyway,
-    // and then so we will check to see that the signed cookie is a valid signed cookie
-    // and contains the user property which is set equal to admin
-    // If it does, then this is an authorized access, so we'll allow to proceed forward.
-    if (req.signedCookies.user === "admin") {
+    if (req.session.user === "admin") {
+      console.log("req.session: ", req.session);
       next();
     } else {
-      // If not, then we'll raise an error at this point.
       let err = new Error("You are not authenticated!");
       err.status = 401;
       next(err);
