@@ -43,49 +43,33 @@ app.use(
   // file store keeps track of all of our sessions and creates a session folder in out project to store all sessions info.
   // Server uses this info to cross-check and make sure that our client is an authorized client.
 );
-// auth middleware
+// We moved "/" andn "/users" endpoints before authentication step,
+// the user would sign up and log in before the authorization is confirmed,
+// So thereby, an incoming user can access the index file at the slash and also access the users endpoint without being authenticated,
+// but for any other endpoint, the user has to be authenticated.
+
+app.use("/", indexRouter);
+app.use("/users", usersRouter);
+// updated auth middleware
 const auth = (req, res, next) => {
   console.log(req.session);
   if (!req.session.user) {
-    let authHeader = req.headers.authorization;
-    if (!authHeader) {
-      let err = new Error("You are not authenticated!");
-      res.setHeader("WWW-Authenticate", "Basic");
-      err.status = 401;
-      // passing error to next() will send this error msg to the error handler below.
-      next(err);
-      return;
-    } else {
-      let [user, password] = new Buffer.from(authHeader.split(" ")[1], "base64")
-        .toString()
-        .split(":");
-      if (user === "admin" && password === "password") {
-        req.session.user = "admin";
-        next();
-      } else {
-        let err = new Error("You are not authenticated!");
-        res.setHeader("WWW-Authenticate", "Basic");
-        err.status = 401;
-        next(err);
-      }
-    }
+    let err = new Error("You are not authenticated!");
+    err.status = 403;
+    // passing error to next() will send this error msg to the error handler below.
+    return next(err);
+  } else if (req.session.user === "authenticated") {
+    next();
   } else {
-    if (req.session.user === "admin") {
-      console.log("req.session: ", req.session);
-      next();
-    } else {
-      let err = new Error("You are not authenticated!");
-      err.status = 401;
-      next(err);
-    }
+    let err = new Error("You are not authenticated!");
+    err.status = 403; // Forbidden
+    return next(err);
   }
 };
 // We are using our auth middleware here right after other middlewares and before express serving static files as we want to serve only to the authenticated users.
 app.use(auth);
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
 app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);
 app.use("/leaders", leaderRouter);
