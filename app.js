@@ -5,6 +5,8 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var session = require("express-session");
 var FileStore = require("session-file-store")(session);
+var passport = require("passport");
+var authenticate = require("./authenticate");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
@@ -43,27 +45,30 @@ app.use(
   // file store keeps track of all of our sessions and creates a session folder in out project to store all sessions info.
   // Server uses this info to cross-check and make sure that our client is an authorized client.
 );
+app.use(passport.initialize());
+app.use(passport.session());
+// When the user is logged in, and the session is initiated by a call to the passport authenticate(local), at the login stage.
+// the passport.authenticate(local) will automatically add the user property to the request message (req.user).
+// and then, the passport.session that we are using in app will automatically serialize that user information and then store it in the session.
+// So subsequently, whenever a incoming request comes in from the client side with the session cookie already in place,
+// then this will automatically load the req.user onto the incoming request.
+// So, that is how the passport session itself is organized.
+
 // We moved "/" andn "/users" endpoints before authentication step,
 // the user would sign up and log in before the authorization is confirmed,
 // So thereby, an incoming user can access the index file at the slash and also access the users endpoint without being authenticated,
 // but for any other endpoint, the user has to be authenticated.
-
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 // updated auth middleware
 const auth = (req, res, next) => {
-  console.log(req.session);
-  if (!req.session.user) {
+  if (!req.user) {
     let err = new Error("You are not authenticated!");
     err.status = 403;
     // passing error to next() will send this error msg to the error handler below.
     return next(err);
-  } else if (req.session.user === "authenticated") {
-    next();
   } else {
-    let err = new Error("You are not authenticated!");
-    err.status = 403; // Forbidden
-    return next(err);
+    next();
   }
 };
 // We are using our auth middleware here right after other middlewares and before express serving static files as we want to serve only to the authenticated users.

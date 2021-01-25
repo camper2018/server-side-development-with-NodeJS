@@ -1,6 +1,7 @@
 var express = require("express");
 const bodyParser = require("body-parser");
 var User = require("../models/user");
+var passport = require("passport");
 var router = express.Router();
 router.use(bodyParser.json());
 
@@ -9,73 +10,41 @@ router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 router.post("/signup", (req, res, next) => {
-  // to prevent duplicate user entry
-  User.findOne({ username: req.body.username })
-    .then((user) => {
-      if (user !== null) {
-        // then the user with that given username already exists,
-        // so you should not allow a duplicate signup
-        var err = new Error("User " + req.body.username + " already exists");
-        err.status = 403; // forbidden
-        next(err);
+  //the mongoose plugin provides us with a method called register, on the user schema and model which we will use here.
+  User.register(
+    new User({ username: req.body.username }),
+    req.body.password,
+    (err, user) => {
+      if (err) {
+        res.statusCode = 500;
+        res.setHeader("Content-Type", "application/json");
+        res.json({ err: err });
       } else {
-        return User.create({
-          username: req.body.username,
-          password: req.body.password,
+        passport.authenticate("local")(req, res, () => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json({
+            success: true,
+            status: "Registration Successful!",
+          });
+          // When this json is received nn our client side, the client can simply extract the success property
+          // and check if it is true or not to quickly identify if the registration was successful.
         });
       }
-    })
-    .then(
-      (user) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json({ status: "Registration Successful!", user: user });
-      },
-      (err) => next(err)
-    )
-    .catch((err) => next(err));
-});
-router.post("/login", (req, res, next) => {
-  if (!req.session.user) {
-    let authHeader = req.headers.authorization;
-    if (!authHeader) {
-      let err = new Error("You are not authenticated!");
-      res.setHeader("WWW-Authenticate", "Basic");
-      err.status = 401;
-      // passing error to next() will send this error msg to the error handler below.
-      next(err);
-      return;
-    } else {
-      let [username, password] = new Buffer.from(
-        authHeader.split(" ")[1],
-        "base64"
-      )
-        .toString()
-        .split(":");
-      User.findOne({ username: username })
-        .then((user) => {
-          if (user === null) {
-            let err = new Error("User " + username + " does not exists!");
-            err.status = 403;
-            return next(err);
-          } else if (user.password !== password) {
-            let err = new Error("Your password is incorrect!");
-            err.status = 403;
-            return next(err);
-          } else if (user.username === username && user.password === password) {
-            req.session.user = "authenticated";
-            res.statusCode = 200;
-            res.setHeader("Content-Type", "text/plain");
-            res.end("You are authenticated!");
-          }
-        })
-        .catch((err) => next(err));
     }
-  } else {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("You are already authenticated!");
-  }
+  );
+});
+router.post("/login", passport.authenticate("local"), (req, res, next) => {
+  // We will add passport.authenticate("local") as a second middleware here.
+  // So when the router post comes in on the login endpoint, we will first call the passport authenticate local.
+  // If this is successful then this will come in and the next function that follows will be executed.
+  // If there is any error in the authentication, this passport authenticate local will automatically send back a reply to the client about the failure of the authentication.
+  // So that is already taken care of.
+  // Unlike the earlier case where we were including username and password in the authorization header,
+  // here we expect this to be included in the body of the incoming post message.
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json");
+  res.json({ success: true, status: "You are successfully logged in!" });
 });
 router.get("/logout", (req, res) => {
   if (req.session) {
