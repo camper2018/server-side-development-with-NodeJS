@@ -22,12 +22,28 @@ router.post("/signup", (req, res, next) => {
         res.setHeader("Content-Type", "application/json");
         res.json({ err: err });
       } else {
-        passport.authenticate("local")(req, res, () => {
-          res.statusCode = 200;
-          res.setHeader("Content-Type", "application/json");
-          res.json({
-            success: true,
-            status: "Registration Successful!",
+        // after the user is successfully registered with the given username and the given password,
+        // then we will set the first name and last name field of the user document here.
+        if (req.body.firstname) {
+          user.firstname = req.body.firstname;
+        }
+        if (req.body.lastname) {
+          user.lastname = req.body.lasttname;
+        }
+        user.save((err, user) => {
+          if (err) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.json({ err: err });
+            return;
+          }
+          passport.authenticate("local")(req, res, () => {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.json({
+              success: true,
+              status: "Registration Successful!",
+            });
           });
           // When this json is received nn our client side, the client can simply extract the success property
           // and check if it is true or not to quickly identify if the registration was successful.

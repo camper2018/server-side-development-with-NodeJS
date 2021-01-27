@@ -1,13 +1,18 @@
-// We'll create a simple user schema which tracks the username and password,
-// and also a flag that is set to indicate whether the user is an administrator or a normal user.
-// We will update the user schema and model to use the passport-local-mongoose.
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var passportLocalMongoose = require("passport-local-mongoose");
 var User = new Schema({
-  // We removed username and password fields from schema as passport-local-mongoose automatically adds them for us.
-  // It will add support for username and hashed storage of the password using the hash and salt(randomly generated string)
-  // and also will add additional methods on the user schema and the model which are useful for passport authentication.
+  // So now our user document will contain, in addition to the username and password,(ie.username and hash and salt that is automatically added by the passport local Mongoose module )
+  // we will also have the first name and last name for the user being defined here.
+  //so this way the user's information can simply be retrieved by looking up the user document here.
+  firstname: {
+    type: String,
+    default: "",
+  },
+  lastname: {
+    type: String,
+    default: "",
+  },
   admin: {
     type: Boolean,
     default: false,
