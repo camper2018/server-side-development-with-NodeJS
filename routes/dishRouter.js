@@ -3,9 +3,12 @@
 // And from our knowledge of Node modules, once we define a new file, that becomes its own Node module.
 // And this Node module can then be imported in index.js.
 
+// GET requests on all the routes or end-points is accessible to all guests users.
+// The other methods requests are available to only authenticated users (i.e we apply authenticate.verifyUser middleware to all those routes.
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const authenticate = require("../authenticate");
 const Dishes = require("../models/dishes");
 const dishRouter = express.Router();
 // dishRouter is a mini express application/ module that can be imported into our index.js file.
@@ -26,7 +29,10 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  // if a post request comes in, it would first execute this middleware, which we have exported from the authentic.js file,
+  //It would verify the user. If this is successful, then it will move on to do the rest of it.
+  // If the authentication fails at this point, then passport authenticate will reply back to the client with the appropriate error message.
+  .post(authenticate.verifyUser, (req, res, next) => {
     Dishes.create(req.body)
       .then(
         (dish) => {
@@ -39,12 +45,12 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     // will receive req processed by next() method in app.all().
     res.statusCode = 403;
     res.end("PUT operation not supported on /dishes");
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Dishes.remove({})
       .then(
         (resp) => {
@@ -71,11 +77,11 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end("POST operation not supported on /dishes/" + req.params.dishId);
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     Dishes.findByIdAndUpdate(
       req.params.dishId,
       {
@@ -93,7 +99,7 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Dishes.findByIdAndRemove(req.params.dishId)
       .then(
         (resp) => {
@@ -128,7 +134,7 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
       .then(
         (dish) => {
@@ -154,14 +160,14 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     // will receive req processed by next() method in app.all().
     res.statusCode = 403;
     res.end(
       "PUT operation not supported on /dishes" + req.params.dishId + "/comments"
     );
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
       .then(
         (dish) => {
@@ -223,7 +229,7 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end(
       "POST operation not supported on /dishes/" +
@@ -232,7 +238,7 @@ dishRouter
         req.params.commentId
     );
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
       .then(
         (dish) => {
@@ -271,7 +277,7 @@ dishRouter
       )
       .catch((err) => next(err));
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
       .then(
         (dish) => {

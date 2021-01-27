@@ -2,6 +2,8 @@ var express = require("express");
 const bodyParser = require("body-parser");
 var User = require("../models/user");
 var passport = require("passport");
+var authenticate = require("../authenticate");
+// const { authenticate } = require("passport");
 var router = express.Router();
 router.use(bodyParser.json());
 
@@ -34,17 +36,26 @@ router.post("/signup", (req, res, next) => {
     }
   );
 });
+// In the login endpoint, we are still using local strategy (ie.the username and password) to authenticate the user.Then will isssue Jwt token.
+//Once authenticated, all of the subsequent requests will simply carry the token in the header of the incoming request message.
+// When the user is authenticated, we're not going to be using sessions anymore.
+// Instead, when the user is authenticated using the local strategy, we will issue a token to the user.
 router.post("/login", passport.authenticate("local"), (req, res, next) => {
+  var token = authenticate.getToken({ _id: req.user._id });
+  // The user ID is sufficient enough here as a payload, to search in the MongoDB for the user.
+  // If we choose to, we can include other parts of the user information as well here, but I would suggest that keep the JsonWebToken as small as possible.
+  // Now, we know that the req.user would be already present, because when the passport.authenticate('local') successfully authenticates the user, this is going to load up the user property onto the request message.
   // We will add passport.authenticate("local") as a second middleware here.
   // So when the router post comes in on the login endpoint, we will first call the passport authenticate local.
   // If this is successful then this will come in and the next function that follows will be executed.
   // If there is any error in the authentication, this passport authenticate local will automatically send back a reply to the client about the failure of the authentication.
-  // So that is already taken care of.
-  // Unlike the earlier case where we were including username and password in the authorization header,
-  // here we expect this to be included in the body of the incoming post message.
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
-  res.json({ success: true, status: "You are successfully logged in!" });
+  res.json({
+    success: true,
+    token: token,
+    status: "You are successfully logged in!",
+  });
 });
 router.get("/logout", (req, res) => {
   if (req.session) {

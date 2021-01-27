@@ -1,8 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const authenticate = require("../authenticate");
 const Leaders = require("../models/leaders");
 const leaderRouter = express.Router();
 leaderRouter.use(bodyParser.json());
+
+// GET requests on all the routes or end-points is accessible to all guests users.
+// The other methods requests are available to only authenticated users (i.e we apply authenticate.verifyUser middleware to all those routes.
 leaderRouter
   .route("/")
 
@@ -18,7 +22,7 @@ leaderRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     Leaders.create(req.body)
       .then(
         (leader) => {
@@ -31,11 +35,11 @@ leaderRouter
       )
       .catch((err) => next(err));
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /leaders");
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Leaders.remove({})
       .then(
         (resp) => {
@@ -62,11 +66,11 @@ leaderRouter
       )
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end("POST operation not supported on /leaders/" + req.params.leaderId);
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     Leaders.findByIdAndUpdate(
       req.params.leaderId,
       {
@@ -84,7 +88,7 @@ leaderRouter
       )
       .catch((err) => next(err));
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Leaders.findByIdAndRemove(req.params.leaderId)
       .then(
         (resp) => {
