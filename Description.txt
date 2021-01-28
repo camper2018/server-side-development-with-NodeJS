@@ -552,4 +552,378 @@ You are given the following example of a leadership document. You will now creat
 The Leaders schema and model should be defined in a file named leaders.js.
 Next, extend the leaderRouter.js to enable the interaction with the MongoDB database to fetch, insert, update and delete information.
 
+Authentication:
+1.Basic Authentication is done with username and password
+  In basic authentication the client will have to explicitly keep adding in the authorization field containing the username and password for every request that the client sends to the server side.
+2.Cookies are yet another mechanism that enables your server to be able to expect the client to store some information on the client side and include that information explicitly in each outgoing request.
+  HTTP cookies, are small piece of data that is sent from a web server and is stored on the client side.
+  Now, almost all browsers have the ability to support the storing of cookies on the client side, and automatically including them in the request when the request is sent to a specific server.
+  So each subsequent request from the client side will include a new header in there with the cookie in the request header.
+  So instead of including your base-64 encoded username and password like we did in the basic authentication, using cookies,
+  your server may set up an explicit piece of information on the client side which then will be included in each outgoing request from the client side.
+3.Now expanding this further, if your server wants to track information about your client, then the server may set up explicitly a session tracking mechanism.
 
+
+Exercise (Instructions): Basic Authentication
+
+Objectives and Outcomes
+In this exercise you will use basic authentication approach to authenticate users.
+At the end of this exercise, you will be able to:
+1.Set up an Express server to handle basic authentication
+2.Use the basic access authentication approach to do basic authentication.
+
+Setting up Basic Authentication:
+You will continue with the Express REST API server that you have been working on in the previous module in the conFusionServer folder.
+1.Open the app.js file and update its contents
+2.Save the changes and start the server. Access the server from a browser by opening an incognito window and see the result.
+3.Do a Git commit with the message "Basic Authentication".
+
+Conclusion:
+In this exercise you learnt about performing basic authentication with username and password in a browser.
+
+Exercise (Instructions): Using Cookies
+Objectives and Outcomes
+In this exercise you will examine the use of cookies for authentication.
+The server will send a signed cookie to the client upon successful authentication, and expects the client to include the cookie with every subsequent request.
+At the end of this exercise, you will be able to:
+
+1.Set up your Express application to send signed cookies.
+2.Set up your Express application to parse the cookies in the header of the incoming request messages
+
+Using cookie-parser:
+1.The cookie-parser Express middleware is already included in the Express REST API application.
+  If you need to add Cookie parser middleware then you can install the NPM module as follows:
+  npm install cookie-parser@1.4.3 --save
+2.Update app.js
+3.Save the changes, run the server and test the behavior.
+4.Do a Git commit with the message "Authentication with Signed Cookies".
+
+Conclusions
+In this exercise you examined the use of cookies for tracking authenticated users
+so that subsequent access to the server can be enabled without need for authentication.
+
+Exercise (Instructions): Express Sessions Part 1:
+
+In this exercise you will use Express sessions to track authenticated users so as to enable authenticated access to server resources. At the end of this exercise you will be able to:
+1.Set up your Express server to use Express sessions to track authenticated users
+2.Enable clients to access secure resources on the server after authentication.
+
+Installing express-session:
+1. Still in the conFusionServer folder, install express-session and session-file-store Node modules as follows:
+   npm install express-session@1.15.6 session-file-store@1.2.0 --save
+Using express-session:
+2. Then, update app.js to use Express session:
+3. Save the changes, run the server and examine the behavior.
+4. Do a Git commit with the message "Express Session Part 1".
+
+Conclusions:
+In this exercise, we have seen how we can set up our express application to use sessions middleware.
+And we also saw how we are using the file store middleware to keep track of our sessions.
+And then set up our application to use express-sessions rather than using their signed cookies for user authentication.
+
+Exercise (Instructions): Express Sessions Part 2:
+In this exercise, we will look at a way of extending our express REST API server to support a new model for registering new users,
+authenticating existing users and logging out a user from our server site.
+So, we will introduce a new user model and schema into our application.
+We'll also look at Express Sessions as a way of tracking the users once the user logs in, and then when the user logs out, the session will be removed from the system
+Objectives and Outcomes
+In this exercise you will continue to use Express sessions to track authenticated users so as to enable authenticated access to server resources. At the end of this exercise you will be able to:
+1.Set up a method for users to register.
+2.Authenticate registered users to enable them to access secure resources.
+3.Enable clients to access secure resources on the server after authentication.
+
+User Model and User Authentication:
+1.Add a new Mongoose model for users in the file named user.js in the models folder.
+2.Update users.js in the routes folder to support user registration, login and logout.
+3.Save the changes and test the server.
+4.Do a Git commit with the message "Express Session Part 2".
+
+Conclusions
+In this exercise we built the support for user registration and authentication.
+1.We extended our Express server to allow users to register themselves and then allow the user to login to the system, and then also logout from the system.
+2.On the server side we are tracking a logged in user using the session and using the cookie on the client side and when the user logs out the cookie is destroyed on the client side.
+
+Passport:
+In the previous lessons, we have seen various strategies for user authentication.
+We started with basic authentication,
+and then moved on to cookies and express sessions as a way of authenticating and tracking users.
+In this lesson we will look at Passport, a node module that makes authentication quite easy.
+Passport is nothing but an authentication middleware which supports various strategies that can be used for user authentication,
+including a local strategy like using username and password,
+or even third party authentication or using OAuth or OAuth 2.0, like using Facebook, Twitter, or Google+, and so on.
+You can use a local strategy for example which is based upon registering users into your system using a username and password,
+and then thereafter authenticating them using the username and password.
+Passport also supports OpenID based authentication or OAuth or OAuth 2.0 based authentication, as is supported by third party authenticators like Facebook, Twitter, Google+, and so on.
+We can also use what is called as JSON web tokens as another way of authentication called token-based authentication.
+Also, Passport supports sessions.
+As we have seen in the previous exercise and the previous lesson, express sessions are a easy way of tracking users on the server side and being able to service incoming requests from clients.
+
+The use of Passport within our application is fairly straight forward:
+1.On the routes on which we want to perform authentication, we just specify passport.authenticate method and then specify the specific authentication strategy that we want to use for the user authentication.
+2.If the authentication is successful, then the middleware moves on to the next step, where we can further process the incoming request.
+3.Upon completion of the successful authentication of the user passport, Passport itself adds a user property to the request message.
+So req.user becomes available for us with the user's information in there, which we can subsequently use within our express application to handle the request coming from specific users
+4.Passport-Local module supports a strategy called as the local strategy for authenticating users with the standard username password combination.
+5.We set up the user schema,and use this schema or model to track the username and password
+and then we depend upon Passport-Local module to verify the username and password.
+6.Passport-Local-mongoose module or plugin adds in the username and a encrypted way of storing the password within our user model.
+7.The encryption is done by using hashing on the password that we use for registering users, and the hash itself uses a salt field.
+8.The salt is a random string that is used for performing the hashing operation on the password for storing.
+  So the hashed password is itself actually stored in our MongoDB database.
+9.Also if we are using sessions that are supported by Passport, then, for supporting sessions,
+  the user information needs to be serialized to be stored with the session information on the server side
+  and then, when the request comes in, from the session ID, the user information needs to be deserialized to extract the user information from our session information that is stored on the server side.
+
+Exercise (Instructions): User Authentication with Passport:
+
+Objectives and Outcomes
+In this exercise, you will explore user authentication with the Passport module.
+You will be able to control access to your REST API server.
+At the end of this exercise, you will be able to:
+1.Use Passport module together with passport-local and passport-local-mongoose for setting up local authentication within your server.
+2.Use Passport together with sessions to set up user authentication.
+
+1.Installing Passport:
+  You will continue working with the Express REST API Server in the conFusionServer folder. You will modify this project to set up user authentication support using Passport.
+  Install the Passport and related Node modules:
+  npm install passport@0.4.0 passport-local@1.0.0 passport-local-mongoose@5.0.1 --save
+
+2.Updating User Schema and Model:
+  In the models folder, update user.js by adding the code to it
+
+3.Adding Passport-based Authentication
+  Add a new file named authenticate.js to the project folder and initialize it
+  Open users.js file in the routes folder and update the code
+  Finally, update app.js.
+  Save the changes and test the server by sending various requests.
+  Do a Git commit with the message "Authentication with Passport".
+
+Conclusions
+In this exercise you used the Passport module to verify the authenticity of users and control access to routes in a REST API server.
+
+Token Based Authentication:
+In the previous lessons, we have seen several different kinds of authentication schemes.
+We started with basic authentication, then we looked at how we can use cookies for doing authentication,
+and even signed cookies, and thereafter, we looked at session-based authentication,
+where the server is keeping track of information about each client, and then the cookie will be used as a way of indexing into the server-side database to extract additional information, to validate the user.
+The cookie and session-based authentications are not scalable, because the server needs to keep track of all the different users.
+So this is where token-based authentication has proved to be very useful.
+With cookie based authentication, we notice that cookies are stored on the client side, and the cookies are included in every outgoing request message whereby, the server is reminded about that specific client, by extracting information from the cookie.
+Cookie can be used together with sessions, whereby the cookies store the session ID, and then when the server receives the incoming request from the cookie, it extracts the session ID and uses that as an index into the server-side session store to retrieve the session information for the particular client.
+Now, this approach as I said, is not very scalable because if you have thousands of sessions, the server needs to keep track of all these thousands of sessions on the server side.
+Even though it is done independent of HTTP in a store, either a file store or a database. But still, the fact that you need to track all of these information makes it not scalable.
+Session-based authentication, as we have seen earlier, works perfectly fine for web applications and can easily take care of user authentication.
+But then, session-based authentication, while violates the principle of stateless servers and also leads to scalability problems.
+The second issue is, mobile applications do not handled session-based authentications very well. Similarly, mobile applications have a hard time dealing with cookies.
+So, in such circumstances where your server is serving data for both a web application, as well as a mobile app, then, the session based authentication will not be very useful,
+and this is where token based authentication becomes a lot more easy to use.
+In a token-based authentication as the name implies, the server will issue a token to a validated user, and all subsequent requests coming from the client side, will bear the token in the request itself, either in the form of a request header or in the body of the request message.
+Furthermore, token-based authentication also helps us to deal with what are called CORS  Cross-origin resource sharing problems.
+Token-based authentication addresses some of the issues that lies with cors and cross-site request forgery related issues.
+Not only that, token-based authentication is a lot more easy for one application to share its authentication with another application, of course, this is all done in a secure manner.
+But, with session based authentication, that is not straight forward.
+In token-based authentication, the user first needs to validate himself or herself on the server side.
+Now, this validation could take on the forms that we have seen earlier.
+So we can use a local validation using username and password. Or, we can even use third party validation using technologies like, oauth or oauth 2.0 or open ID.
+No matter which way the user authenticates, once the user is authenticated, right after, your server can simply issue a token to the user.
+And all subsequent communication between the user and the server, can be done simply using this token.
+JSON Web Token that we will talk about, is one such token-based authentication scheme,
+and there server when it creates this token, it will create a signed token, using a secret on the server site which only the server knows.
+So thereby, even if a third party in towards and between and tries to manipulate the token, even if it captures the token and tries to manipulate the token, the token will become invalid.
+And so, that way of protecting the user is easily feasible, all subsequent requests from the client side should carry the token in the request, either, in the header or in the body of the request message.
+So when the server receives this token, the server will verify the token, to ensure that this is a valid token,
+and then if it is a valid token, the server will then respond to the incoming request.
+As I mentioned, JSON Web Tokens is one such token-based authentication scheme.
+JSON Web Token, is a very simple way of encoding information in a token then pass it to the client site.
+JSON Web Token itself is based on standards, this is based on the IETF RFC 7519. IETF stands for the Internet Engineering Task Force.
+The organization that mandates everything about how the internet works, and deals with the protocols and the policies, related to the internet.
+The RFC, stands for the standards document, in IETF terms, RFC stands for Request for Comments.
+And each such standards document carries a number. 7519 in this case refers to the document, the standard document related to JSON Web Token.
+The JSON Web Token itself is a self contained token, it carries all the information within itself, that is necessary to identify the user.
+Not only that, a JSON Web Token can be shared between two applications.
+So for example, one application when it authenticates and then gets hold of a JSON Web Token, can pass that JSON Web Token to and in that application, that it is willing to authorize to access the server on its behalf.
+This sharing of the token is done in a very secure manner
+Thereby, the authorization is transferred over to a second application, and the second application can authorize on behalf of the first application, to communicate with the server.
+This is feasible with tokens
+A JSON Web Token, as I said, is encoded into a long string and this string itself can be interpreted as consisting of three parts.
+The string itself can, or the encoded string itself contains three parts, the Header, the Payload, and the Signature.
+That carries enough information about how this token is encoded.
+The Header itself contains the specific algorithm that is used for encoding this JSON Web Token, and the type of the token itself.
+The algorithm in this case, would be HS256 which is a 256 bit encoding scheme, that is used for hashing the information inside of the token.
+And in this case, this happens to be the JSON Web Token, and so the type field will be set to JWT.
+And so that is the information that is stored in the header of JSON Web Token.
+The Payload itself, carries information that helps you to identify the user.
+In the exercise that we will do, our payload only carry the ID of the user inside the payload. No other information is necessary.
+This ID can be used on the server side, to index into the Mongo DB to retrieve the full user information if required.
+So, you will see that we'll encoding the ID and then storing it in the payload of that message.
+You can store additional information in the payload of the message if you require.
+But the more information that you stored there, the larger the corresponding JSON Web Token is going to me.
+So, try to limit the amount of information that you stored in the payload of the JSON Web Token.
+As we will see in the exercise, we have a node module that enables us to encode and create a JSON Web Token, based on the information that we want to put in the payload.
+Now, when you create a JSON Web Token, you also supply a signature.
+A secret key on the server side which is used for encoding this JSON Web Token, and that secret is also included in the signature part of the JSON Web Token.
+The signature itself is included in such a way that there is a basics before encoded header and payload, which is then encoded using the specific secret that is used by the server.
+And this encoded in, as I said the HMAC, that we have referred to in one of the previous lessons and using the 256 bit hashing, and that is included in the signature.
+So, when this JSON Web Token is received on the server side, and when the server decodes this token,
+then the server is able to cross check to make sure that this JSON Web Token has not been tampered by anybody, while the token is being passed between the client and the server site.
+As I mentioned, if you need to deal with JSON Web Tokens in your node application, there is a specific node module called as the jsonwebtoken Node Module.
+This node module implements the JSON Web Token related standards, and it can be included into your node application.
+This module itself, provides a method called sign which allows you to sign and issue the token to the client from the server side.
+It also contains a verify method which can be used to verify the authenticity or to ensure the authenticity of the incoming JSON Web token,
+so we will be making use of the JSON Web token module
+Together with the JSON Web Token module, we also used the Passport-JWT module, node module, which provides the jwt based strategies for our passport authentication module.
+So this provides a passport strategy for authenticating using JSON Web Token.
+So this allows you to authenticate RESTful endpoint using the JWT as the method for dong the validation, without requiring the server to use sessions.
+Now, the JWT passport module, supports a method of even extracting the JWT token from the incoming request message, and then even verifying the token on your behalf.
+The Passport-JWT module in turn uses the JSON Web Token module for doing the verification of that JSON Web Token.
+The token itself can be carried in the header of the incoming request, even in the authentication header of the incoming request, which is what we will be doing in the exercise.
+The token can be also carried in the body of the incoming request, in which case, we have to extract the token from the body of the incoming request and then make use of it.
+The Passport-JWT module, supports that also if you choose to use that as way of passing the token back from the client to the server site.
+The JSON Web Token, can be also included in the URL query parameters if you so choose to, and can be extracted from there b Passport-JWT and used for authentication.
+
+Exercise (Instructions): User Authentication with Passport and JSON Web Token:
+Objectives and Outcomes
+In this exercise, you will explore user authentication with JSON web tokens and the Passport module. You will be able to control access to some routes within your REST server. At the end of this exercise, you will be able to:
+1.Use JSON web tokens for token-based user authentication
+2.Use Passport module together with passport-local and passport-local-mongoose for setting up local authentication within your server
+
+1.Installing passport-jwt and jsonwebtoken Node Modules:
+  You will continue working with the Express REST API Server in the conFusionServer folder.
+  You will modify this project to set up user authentication support using tokens and Passport.
+  Install the passport-jwt and the jsonwebtoken modules as follows:
+  npm install passport-jwt@4.0.0 jsonwebtoken@8.3.0 --save
+2.Updating the App to use JSON Web Tokens:
+  Create a new file named config.js and add the following code to it
+3.Supporting JSON Web Tokens and Verification:
+  Update authenticate.js.
+  Open users.js file in the routes folder and update the code.
+  Update app.js to remove the auth function and the app.use(auth), and update it.
+4.Controlling Routes with Authentication:
+  Open dishRouter.js and updated the code for the '/' route
+  Do similar updates to promoRouter.js and leaderRouter.js.
+  Save the changes and test the server by sending various requests.
+  Do a Git commit with the message "Passport JWT".
+Conclusions
+In this exercise you used token-based verification together with the Passport module to verify the authenticity of users and control access to routes in a REST API server.
+
+Mongoose Population:
+In this lesson you will learn about how you can reference one document from another in MongoDB. In addition you will use Mongoose population to populate information in a document from a referenced document. At the end of this lesson, you will be able to:
+1.Reference a MongoDB document from another document
+2.Use Mongoose population to populate information into a document from a referenced document
+
+Document databases, the NoSQL databases, are not designed with relations in mind.
+Everything that you need in a document is stored completely within the document. i.e documents are self-contained.
+So you do not have support for relations that you might be more familiar with from the relational database world.
+MongoDB has taken a few steps in that direction, even with the NoSQL databases.
+Now of course, there are situations where you have other documents that already contained the information.
+And you may want to pull that information into your existing document, rather than duplicating that information.
+MongoDb or Mongoose allow you to store references to other documents within a current document by using ObjectId of the other document ( i.e {type: mongoose.Schema.Types.ObjectId, ref: 'User'} i.e ObjectId referencing to User Schema)
+It allows you to perform a way of taking the information from the other document and then enclosing it inside the correct document using the Mongoose population support.
+Population is the process of automaticaaly replacing specified paths within a document with documents from another collection or document.
+And the compound document will be constructed and then sent back to you.
+e.g Dishes.find({}).populate('comments.author')
+Now the expectation is that the comments.author field is actually an OjectId which references to the user document.
+var commentsSchema  = new Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
+})
+So this populate call that we perform here will then go and fetch from the database each individual author's record or the user's record.
+And then take that user document and populates it into the dishes document to construct the compound document from here.
+But of course, let me caution you that this population operation is not an easy task for the server to do.
+Because every single dish, you will have to examine each and every comment.
+Then for each and every comment, then you need to find out their ObjectId for the user.
+Then you go and fetch that user document and then populate it inside the dish document.
+And then, that has to be repeated for every single comment that is contained in that Dishes document.
+It essentially means that it'll take a much longer time for the server side to complete the request and send back the information to the client side.
+So I would suggest that you should use populate very judiciously. You should use it only in circumstances where you really need that information.
+In our app when we authenticate the user, the user's information is already loaded into every request that comes in from the client side.
+And so the user information is available to us.
+So when we are posting the comment on the server side, we will also capture the user's ID and then store it in the author field of the comment schema.
+So on the server side we should validate the user and only for users that are signed in, we would allow them to post comments.
+And then when they post comments, we will automatically fill in the author field for that comment document by substituting the author field with the ObjectId of the user.
+
+Exercise (Instructions): Mongoose Population
+In this exercise, we have seen the use of mongoose population and we have also seen how we can populate information from one document into another document.
+Whereby, when we modify the server to do the population for the requests, mongoose will automatically take care of populating this information for us.
+All that we need to do, is to store the reference to the other document in the form of the object ID, in the document into which you want to populate this information.
+Objectives and Outcomes
+In this exercise you will learn about how you can reference one document from another in MongoDB. In addition you will use Mongoose population to populate information in a document from a referenced document. At the end of this exercise, you will be able to:
+1.Use Mongoose population to cross-reference users within a comment
+2.Populate the comments with the users’ information upon querying
+
+Using Mongoose Population:
+1.Open user.js and update the code for the schema.
+2.Open dishes.js and update the comment schema
+3.Open dishRouter.js and update the routers and the methods.
+4.Open users.js and update the register function
+5.Save all the changes and start the server and test.
+6.If you happen to have a registered user in your MongoDB, then use the Mongo REPL to delete the user.
+7.Do a Git commit with the message "Mongoose Population".
+
+Conclusions
+In this exercise you learnt about cross-referencing Mongo documents using the ObjectId.
+In addition you learnt about using Mongoose population support for populating documents.
+
+Assignment 3: User Authentication
+In this assignment you will continue the exploration of user authentication.
+We have already set up the REST API server to validate an ordinary user.
+Now, you will extend this to verify an Admin and grant appropriate privileges to an Admin.
+In addition you will allow only a registered user to update and delete his/her submitted comments.
+Neither another user, nor an Admin can edit these comments.
+
+Step-By-Step Assignment Instructions
+less
+Assignment Overview
+
+At the end of this assignment, you would have completed the following:
+
+1.Check if a verified ordinary user also has Admin privileges.
+2.Allow any one to perform GET operations
+3.Allow only an Admin to perform POST, PUT and DELETE operations
+4.Allow an Admin to be able to GET all the registered users' information from the database
+5.Allow a registered user to submit comments (already completed), update a submitted comment and delete a submitted comment.
+  The user should be restricted to perform such operations only on his/her own comments.
+  No user or even the Admin can edit or delete the comments submitted by other users.
+
+Assignment Requirements:
+
+This assignment is divided into three tasks as detailed below:
+
+Task 1
+
+In this task you will implement a new function named verifyAdmin() in authenticate.js file.
+This function will check an ordinary user to see if s/he has Admin privileges.
+In order to perform this check, note that all users have an additional field stored in their records named admin, that is a boolean flag, set to false by default.
+Furthermore, when the user's token is checked in verifyOrdinaryUser() function, it will load a new property named user to the request object.
+This will be available to you if the verifyAdmin() follows verifyUser() in the middleware order in Express.
+From this req object, you can obtain the admin flag of the user's information by using the following expression:
+req.user.admin
+You can use this to decide if the user is an administrator.
+The verifyAdmin() function will call next(); if the user is an Admin, otherwise it will return next(err);
+If an ordinary user performs this operation, you should return an error by calling next(err) with the status of 403, and a message "You are not authorized to perform this operation!".
+
+Task2
+
+In this task you will update all the routes in the REST API to ensure that only the Admins can perform POST, PUT and DELETE operations. Update the code for all the routers to support this. These operations should be supported for the following end points:
+
+1.POST, PUT and DELETE operations on /dishes and /dishes/:dishId
+2.DELETE operation on /dishes/:dishId/comments
+3.POST, PUT and DELETE operations on /promotions and /promotions/:promoId
+4.POST, PUT and DELETE operations on /leaders and /leaders/:leaderId
+
+Task 3
+
+In this task you will now activate the /users REST API end point.
+When an Admin sends a GET request to http://localhost:3000/users you will return the details of all the users.
+Ordinary users are forbidden from performing this operation.
+
+Task 4
+
+In this task you will allow a registered user to update or delete his/her own comment.
+Recall that the comment already stores the author's ID.
+When a user performs a PUT or DELETE operation on the /dishes/:dishId/comments/:commentId REST API end point, you will check to ensure that the user performing the operation is the same as the user that submitted the comment.
+You will allow the operation to be performed only if the user's ID matches the id of the comment's author.
+Note that the User's ID is available from the req.user property of the req object.
+Also ObjectIDs behave like Strings, and hence when comparing two ObjectIDs, you should use the Id1.equals(id2) syntax.

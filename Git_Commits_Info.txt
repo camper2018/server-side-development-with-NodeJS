@@ -21,4 +21,14 @@
 20.Express REST API with MongoDB and Mongoose Part 2 ----> Add support for accessing and updating comments within the dishes.
 21.Assignment 2 -----> Add promotions and leaders REST API end-points.
    Refer Description.txt for details
-
+22.Basic Authentication ---> With username and password
+23.Authentication with Signed Cookies
+24.Express Sessions Part 1
+25.Express Sessions Part 2
+26.Add few comments.
+27.Authentication with Passport ---> an npm module that supports user local authentication and tracking via cookie and session.
+28.Authentication with Passport JWT
+29.Mongoose Population ---->  Turned the author field into a reference to a user document,
+and using Mongoose population, populated the information into the dishes document
+in order to supply the information to the client side when required.
+30.Assignment 3 User Authentication
