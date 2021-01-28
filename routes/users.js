@@ -8,9 +8,22 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
+router.get(
+  "/",
+  authenticate.verifyUser,
+  authenticate.verifyAdmin,
+  function (req, res, next) {
+    User.find({}).then(
+      (users) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(users);
+      },
+      (err) => next(err)
+    );
+    // .catch((err) => next(err));
+  }
+);
 router.post("/signup", (req, res, next) => {
   //the mongoose plugin provides us with a method called register, on the user schema and model which we will use here.
   User.register(

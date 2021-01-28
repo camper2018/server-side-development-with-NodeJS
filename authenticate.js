@@ -69,6 +69,17 @@ exports.jwtPassport = passport.use(
     });
   })
 );
+exports.verifyAdmin = (req, res, next) => {
+  console.log("request user: ", req.user);
+  if (req.user.admin) {
+    next();
+  } else {
+    let err = new Error("You are not authorized to perform this operation!");
+    err.statusCode = 403;
+    next(err);
+  }
+};
+
 // This verifyUser will verify or authenticate user using jwt token without using sessions.
 exports.verifyUser = passport.authenticate("jwt", { session: false });
 // How does the JWT strategy work?
@@ -76,3 +87,6 @@ exports.verifyUser = passport.authenticate("jwt", { session: false });
 // The token will then be extracted and used to authenticate the user based upon the token.
 // The verifyUser, which calls upon the passport authenticate with JWT uses this token that comes in the authentication header and then verifies the user.
 // So, anytime I want to verify the user's authenticity, I can simply call verify user, and that will initiate the call to the passport.authenticate and verify the user.
+// exports.verifyAdmin = passport.authenticate("jwt", {
+//   session: false,
+// });
