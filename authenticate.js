@@ -69,16 +69,6 @@ exports.jwtPassport = passport.use(
     });
   })
 );
-exports.verifyAdmin = (req, res, next) => {
-  console.log("request user: ", req.user);
-  if (req.user.admin) {
-    next();
-  } else {
-    let err = new Error("You are not authorized to perform this operation!");
-    err.status = 403;
-    return next(err);
-  }
-};
 
 // This verifyUser will verify or authenticate user using jwt token without using sessions.
 exports.verifyUser = passport.authenticate("jwt", { session: false });
@@ -90,3 +80,36 @@ exports.verifyUser = passport.authenticate("jwt", { session: false });
 // exports.verifyAdmin = passport.authenticate("jwt", {
 //   session: false,
 // });
+
+exports.verifyAdmin = (req, res, next) => {
+  console.log("request user: ", req.user);
+  if (req.user.admin) {
+    next();
+  } else {
+    let err = new Error("You are not authorized to perform this operation!");
+    err.status = 403;
+    return next(err);
+  }
+};
+//  or
+// The below function works too
+// exports.jwtPassport = passport.use(
+//   new JwtStrategy(opts, (jwt_payload, done) => {
+//     console.log("JWT payload: ", jwt_payload);
+//     User.findOne({ _id: jwt_payload._id }, (err, user) => {
+//       if (err) {
+//         return done(err, false);
+//       } else if (user) {
+//         console.log("user:", user);
+//         if (user.admin == true) {
+//           return done(null, user);
+//         } else {
+//           return done(null, false);
+//         }
+//       } else {
+//         return done(null, false);
+//       }
+//     });
+//   })
+// );
+// exports.verifyAdmin = passport.authenticate("jwt", { session: false });
