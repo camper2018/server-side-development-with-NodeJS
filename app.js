@@ -32,6 +32,26 @@ connect.then(
 );
 
 var app = express();
+// To configure the server such that it will redirect any traffic coming to the unsecure port i.e port 3000 , it'll redirect that request to the secure port.
+// So to do that, we will set up a middleware right after we declare the app.express:
+app.all("*", (req, res, next) => {
+  // app.all means, for all requests no matter what the path in the request is our request coming in, we redirect that.
+  if (req.secure) {
+    //If the incoming request is already a secure request,
+    // then the request object will carry this flag called secure set to true.
+    return next();
+  } else {
+    // If the incoming request is not at secure port, then the req.secure will not be set.
+    res.redirect(
+      307,
+      "https://" + req.hostname + ":" + app.get("secPort") + req.url
+      // req.url ---> path or api.
+      // 307 here represents that the target resource resides temporarily under different URL.
+      // And the user agent must not change the request method if it reforms in automatic redirection to that URL.
+      // So, we'll be expecting user agent to retry with the same method that they have used for the original end point.
+    );
+  }
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
