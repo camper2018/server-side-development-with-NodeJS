@@ -927,3 +927,174 @@ When a user performs a PUT or DELETE operation on the /dishes/:dishId/comments/:
 You will allow the operation to be performed only if the user's ID matches the id of the comment's author.
 Note that the User's ID is available from the req.user property of the req object.
 Also ObjectIDs behave like Strings, and hence when comparing two ObjectIDs, you should use the Id1.equals(id2) syntax.
+
+HTTPS and Secure Communication:
+Zny time we need to use user authentication, first, in the form of, say, supplying the credentials to authenticate yourself
+and thereafter, authenticating yourself by including either the cookie or the token in the header of the request message,
+we should be doing this over a secure channel.
+which means that we should not be using HTTP and then including these credentials into either the header or the body of the request messages without encryption.
+Check the slides for how HTTPS works.
+Cryptography:
+If you need to send a message over a channel to another user, then you would want to be able to encrypt the message in such a way that only the receiver will be able to decrypt the message
+and obtain the information that you are trying to send to the receiver.
+So both the sender and the receiver should understand on establish between the two of them how this encryption process and how the decryption is going to work.
+For this to work, any encryption and decryption works based on exchange of secret keys.
+So in symmetric key cryptography, both the sender and the receiver will share a secret key between the two sites,
+and this secret key is known only to the sender and to the receiver side.
+So when the sender needs to send the message,
+then the sender will encrypt this message using a cryptography algorithm, which uses the secret key as the other input to this algorithm.
+And once this message is passed through this cryptography algorithm, then an encrypted message will be generated.
+Now, this encrypted message will be sent to the channel across to the receiver side.
+If you have a third party malicious user sitting in between and listening and capturing this encrypted message,
+they would have a hard time decrypting this message because for decrypting an encrypted message, you still need the secret key.
+Now, on the receiver side, when the encrypted message is received, then the receiver will apply and a decryption algorithm,
+which also takes as the input, the same secret key that was used on the sender side to encrypt the message.
+So upon decryption, the original message will be retrieved and can be processed on the receiver side.
+Now, if a malicious third party wants to decrypt this encrypted message, they are going to face an uphill battle because the process of encrypting using the secret key will turn the message and can, in turn, encrypt the message.
+Without possessing the secret key, it is going to be next to impossible to decrypt the encrypted message.
+If you use brute force techniques, then eventually, you will end up decrypting the encrypted message.
+But it is going to take so long and require so much of computation power. It will be not worth the effort for the third party malicious user to try and decode the encrypted message.
+So you are essentially making it really difficult for somebody to decrypt the message if they don't possess the secret key.
+Now, since the secret key is known only to the sender and the receiver, the two end parties, the sender and the receiver, can communicate with the assurance that in encrypted message from the sender side can only be decrypted by the receiver side.
+So this is how symmetric key cryptography works.
+The fact that you have the same secret key being shared between the sender and the receiver means that the inclusion of decryption process used the same secret key, hence, symmetric key cryptography.
+Of course, with the symmetric key cryptography, one of the issues is that both the sender and the receiver needs to have access to the same secret key.
+Now, if the sender and receiver are communicating over an insecure channel, it is going to be difficult for both sides to come to an understanding about the same secret key without disclosing it to others.
+So this is where another algorithm called public-key cryptography is very useful.
+In public-key cryptography, the idea is that you have two different keys.
+You have a public key and a private key.
+Now, the public key can be widely distributed to anyone that you want.
+So when somebody wants to send a message to you, they are going to use your public key to encrypt the message.
+So if a sender here wants to send the message to the receiver, then the sender will use the public key off the receiver to encrypt the message on the sender side using the encryption algorithm.
+Now, once the encrypted message is sent across over the insecure channel to the receiver side, the receiver will then use the private key that only the receiver knows in order to decrypt.
+Now, for public-key cryptography to work as we saw, the public key can be widely distributed without any concern.
+But since the private key is only known to the receiver side, only the receiver will be able to decrypt the message,
+and, again, a third-party intruder that captures this encrypted message will find it inordinately difficult to decrypt the message.
+Now, of course in public-key cryptography, the public and the private key are two different keys.
+Now, then your obvious next question would be why not simply use public-key cryptography for encryption.
+The problem is that using public-key cryptography for encryption and decryption is an expensive process, and so that is why we don't use public-key cryptography for their entire communication.
+Instead, the public-key cryptography is going to be used primarily for the sender and the receiver to agree upon the common secret key that the two are going to use.
+We will later on see how the public-key cryptography can be used to establish the common secret key between the sender and the receiver and then subsequently use symmetric key cryptography for further communication.
+One protocol that uses this approach is the Secure Sockets Layer and also the Transport Layer security protocols, SSL and TLS in short.
+These cryptography protocols enable secure communication between the sender and the receiver over an insecure network like the Internet.
+The sender and the receiver will communicate over this Internet using encrypted messages, which only the sender and the receiver can decrypt.
+And this approach, either the SSL or TLS, uses a combination of public-key cryptography together with symmetric key cryptography.
+Their exact process of doing this, is explained in the slide.
+In addition, using SSL or TLS, we are trying to maintain two different things.
+We are, first, trying to maintain the privacy of the communication between the sender and the receiver so that no malicious third party can extract the message from the encrypted message.
+Second, we are also trying to maintain integrity, meaning that when the sender sends a message, the receiver will be able to be assured that the message has not being tampered with.
+So both security and maintaining integrity is very important in this case.
+So both privacy and integrity has to be maintained by this secure communication protocol that we build for exchange between the sender and the receiver.
+Let's briefly talk about how SSL or TLS actually work.
+This is done through a handshaking process which has been illustrated in the slide.
+When a client wants to communicate with the server, the client sends a message to the server, specifying that the client wants to communicate with the server securely.
+At this point, the server will send back the certificate to the client, which contains a public key, which has been certified by the certification authority as belonging to that particular server.
+So that way, when the client receives this public key plus the certification by the certification authority, the client will be able to verify the server's credentials.
+So, the client needs to establish that it is really talking to the server, that it is intending to communicate with.
+So at this point, when the client verifies the server's credentials, the client now has access to the public key of the server.
+Once the client gets hold of the public key of the server, then the client will generate what is called as the pre-master secret.
+This pre-master secret is something that both the client and server will use to generate what is called as a session key.
+So, the client generates a pre-master secret, the client then encrypts that secret using the server's public key, and then sends the secret across to the server.
+Now, remember that once the secret is encrypted using the public key, nobody other than the server will be able to extract the information from the encrypted message.
+So, when the server receives this encrypted message, the server extracts the pre-master secret from this message.
+Now, both the client and the server possess the same pre-master secret.
+At this point, both the client and the server will use the same set of steps starting with the pre-master's secret, and with the same set of values, that will generate a key called as the session key.
+Now, when the session key is generated both on the clients side and the server side, it will be exactly the same session key, because both will follow exactly the same process for generating the session key.
+So, at this point, both the client and the server, now possess a secret key which is the same on both the sites.
+So, all subsequent communication between the server and the client, can then proceed using symmetric encryption.
+So, when the client needs to communicate with the server, the client will encrypt the data using the secret session key, and then send over their data.
+Similarly, when the server needs to communicate with the client, the server will obviously use the same session key to encrypt the data and then send it over to the client.
+Now, since the client possesses the same session key, the client will be able to decrypt the message and extract the unencrypted message.
+By using this procedure, the client and the server has ensured that the communication between them is private.
+Also, we manage to ensure that no malicious third party can intercept the message and cause any changes to the message.
+So, integrity of the message is also maintained, and the privacy of the communication between the client and the server is also maintained.
+Now, if you are interested in learning more about this, one good source for learning about Cryptography Protocols is a very good book by Jim Crozon Keith Ross called Computer Networks.
+This book has a very easy to understand chapter about cryptography and security as applied to network communication.
+Now that we have established the process for being able to communicate securely between a client and server,
+let's look at how the internet itself leverages this, for communication between a client and the server using HTTP.
+Now, this is where the HTTPS protocol comes into the picture.
+As you already understand about the internet, the internet is a layered architecture, where the IP and the TCP form the network, and the transport layer which runs on top of the underlying network.
+Now, on top of the transport layer, you have the secure socket layer or the transport layer security lining as a thin layer on top of TCP which ensures secure communication between the client and the server.
+And on top of it HTTP can run. So, HTTP essentially involves HTTP plus the use of encryption, decryption supported through SSL and TLS.
+From the perspective of the implementation of the server side, what we have understood here is sufficient enough for us to understand how to configure a server to use secure communication between the client and the server.
+Now, of course the first question that will come to your mind is, that the server needs a public key and a private key.
+For a public key cryptography, how does the server generate this?
+If you are running a real production server in your environment and providing service for users to access your server, then obviously you need to go through the certification process.
+This is where you will approach a certification authority, for example, corporations like VeriSign and Thawte Corporation which are Public Certification Authorities.
+There are a few more around the world.
+So, you will approach them, and these Certification Authorities will then authenticate your credentials, they will ensure that you are who you claim to be, and then they will verify your credentials, and then at that point, they will issue you a public key and a private key for use on your server site.
+So once they issue the public key and the private key, the public key will be certified by the Certification Authority, and then the public key will also carry, in addition, the certificate.
+So, this is the certificate that you will send to the client's site.
+Since clients can establish the authenticity of these Certification Authorities, if you look at any browser you would notice that most browsers will have the certificates for all these established Certification Authorities already built into them.
+So they will be able to establish your credentials, or rather, they will be able to establish that the private key belongs to you, by obtaining your certificate and then checking or verifying your certificate knowing that it has been signed by one of these established Certification Authorities.
+Upon this process, client will be able to establish your authenticity.
+Now, in this course, we just want to understand how each HTTPS works, and also want to have a simple way of setting up the server with a public key and the private key.
+Since we are doing this as an exercise to understanding HTTPS, we can use a tool called open SSL that is already available on our computers to generate what is called the self-signed certificate.
+Self-signed keys are not acceptable in the outside work.
+But since we know that we are using it only for our testing purposes, we can use self-signed certificates, simply for understanding the process of the secure communication between the client and server.
+So, how do we use open SSL? So far using open SSL you can generate Keys, using three commands that I show you here.
+You execute these three commands in that sequence, as specified here and that will help you to generate a private key and a certificate that you can make available from the your HTTPS server for clients to download and thereby obtain your public key for secure communication.
+So this is the operation we are going to do in our exercise that follows this lecture to establish and issue DPS service.
+So the three steps that we do is, first, we will generate the private key by using the first command.
+Then after that we will generate a cert.csr which will then be used for us to generate a certificate that can be distributed to the client side by the third command shown there.
+So these steps will enable you to generate a private key and also a corresponding certificate that can be issued to the client.
+
+Exercise (Instructions): HTTPS and Secure Communication:
+In this exercise you will explore the use of the HTTPS server core node module to create and run a secure server. You will also learn about generating your private key and public certificate and use them to configure your Node HTTPS server. At the end of this exercise, you will be able to:
+
+1.Configure a secure server in Node using the core HTTPS module
+2.Generate the private key and public certificate and configure the HTTPS server
+3.Redirect traffic from the insecure HTTP server to a secure HTTPS server.
+
+Generating Private Key and Certificate:
+1.Go to the bin folder and then create the private key and certificate by typing the following at the prompt:
+  openssl genrsa 1024 > private.key
+  openssl req -new -key private.key -out cert.csr
+  openssl x509 -req -in cert.csr -signkey private.key -out certificate.pem
+2.Note for Windows Users:
+  If you are using a Windows machine, you may need to install openssl.
+  You can find some openssl binary distributions here, https://wiki.openssl.org/index.php/Binaries
+  Also, this article gives the steps for generating the certificates in Windows,  https://blog.didierstevens.com/2015/03/30/howto-make-your-own-cert-with-openssl-on-windows/
+  Another article provides similar instructions, https://www.faqforge.com/windows/use-openssl-on-windows/
+  Here's an online service to generate self-signed certificates,  http://www.selfsignedcertificate.com/
+
+Configuring the HTTPS Server:
+
+1.Open the www file in the bin directory and update its contents
+2.Open app.js and add code to the file
+3.Run the server and test.
+4.Do a Git commit with the message "HTTPS".
+
+Conclusion:
+In this exercise, you learnt about configuring a secure server running HTTPS protocol in our Express application.
+
+Uploading Files:
+Multer is the node module where that will help the server handle multipart/form-data.
+It is an express middleware that enables us to process the incoming request message that contains this multipart/form-data in the request message on server side.
+This is written on top of another npm module called busboy.
+Busboy is a module that processes incoming HTML form data, general HTML form data.
+Multer will upload the incoming form data and it adds a body object to the req.
+So you will have a req.body object and also a req.file object.
+If you upload a single file, then it'll continue req.file object.
+Then if you set up your Multer to accept multiple file uploads, then you can set up the req.files object.
+The files object will be an array which contains all the information for each particular file that is uploaded on the server-side.
+
+Exercise (Instructions): Uploading Files
+In this exercise you will leverage the Multer module to set up your Express server to accept file uploads. At the end of this exercise you will be able to:
+
+1.Configure the Multer module to enable file uploads
+2.Use the Multer module in your Express application to enable file uploads to a designated folder
+
+Installing Multer
+1.At the prompt in your conFusionServer project, type the following to install Multer:
+  npm install multer@1.3.1 --save
+Setting up File Uploading
+2.Add a new Express router named uploadRouter.js in the routes folder and add code to it.
+3.Then update app.js to import the uploadRouter and configure the new route
+4.Save all the changes and test your server.
+5.Do a Git commit with the message "File Upload".
+
+Conclusions
+In this exercise you learnt to leverage the Multer module to configure your Express server to enable file uploads.
+
+

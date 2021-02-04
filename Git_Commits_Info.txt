@@ -32,3 +32,9 @@
 and using Mongoose population, populated the information into the dishes document
 in order to supply the information to the client side when required.
 30.Assignment 3 User Authentication
+31.Add minor corrections to verifyAdmin ----> in authenticate.js
+32.Add minor correction ----> in routers/users.js
+33.Add another verifyAdmin middleware ----> Both are functioning fine.
+  for the newer verifyAdmin, we don't need to apply verifyUser on routes that are only allowed for admin user. VerifyAdmin  will authenticate as well as check for admin user.
+34.HTTPS
+35.File Upload ---> Using npm Muller module.
