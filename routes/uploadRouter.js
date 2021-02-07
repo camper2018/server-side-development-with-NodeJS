@@ -6,7 +6,7 @@ const multer = require("multer");
 // So, multer provides this disk storage function which enables us to define the storage engine and in here we can configure a few things.
 // Now, if it is just a matter of configuring the destination, you can simply say dest colon, and then specify the destination folder within which the uploaded files will be stored.
 // But here I'm going to do some further configuration for the multer module here.
-
+const cors = require("./cors");
 const storage = multer.diskStorage({
   // This function will receive request and also an object called the file, which contains information about the file that has been processed by multer and also a callback function
   destination: (req, file, cb) => {
@@ -34,11 +34,20 @@ const uploadRouter = express.Router();
 uploadRouter.use(bodyParser.json());
 uploadRouter
   .route("/")
-  .get(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    res.statusCode = 403;
-    res.end("GET operation not supported on /imageUpload");
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
   })
+  .get(
+    cors.cors,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      res.statusCode = 403;
+      res.end("GET operation not supported on /imageUpload");
+    }
+  )
   .post(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     // make use of the upload which we configured using multer above, which supports a function called as upload.single()
@@ -53,11 +62,17 @@ uploadRouter
       res.json(req.file); // req.file object
     }
   )
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    res.statusCode = 403;
-    res.end("PUT operation not supported on /imageUpload");
-  })
+  .put(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      res.statusCode = 403;
+      res.end("PUT operation not supported on /imageUpload");
+    }
+  )
   .delete(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
