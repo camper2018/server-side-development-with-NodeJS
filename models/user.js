@@ -23,3 +23,10 @@ var User = new Schema({
 // to use passport-local-mongoose as a plugin in our mongoose schema and model, we will add:
 User.plugin(passportLocalMongoose);
 module.exports = mongoose.model("User", User);
+
+// When a user logs in to the facebook account and obtains an access token,
+// it passes in the access token to our express server,
+// then we will fetch the user profile from facebook by sending this access token togehter with our appId and secret,
+// and then will get user profile object back,
+// we can use that profile with firstname, lastname and facebookId to setup an account for that user in our local server
+// and also saving the profile in our db (user collection).
