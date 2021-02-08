@@ -110,4 +110,34 @@ router.get("/logout", cors.corsWithOptions, (req, res) => {
     next(err);
   }
 });
+// Now, we're going to be using Facebook for logging in the user
+// So if the user sends a get request to users/facebook/token, then we're going to be authenticating the user using the Facebook OAuth 2 based authentication.
+router.get(
+  "/facebook/token",
+  passport.authenticate("facebook-token"),
+  (req, res) => {
+    if (req.user) {
+      // when we call passport.authenticate with the facebook-token strategy, if it is successful, it would have loaded in the user into the request object.
+      var token = authenticate.getToken({ _id: req.user._id });
+      // So essentially, the user is sending the access token to the express server, the express server uses the accessToken to go to Facebook and then fetch the profile of the user.
+      // And if the user doesn't exist, we'll create a new user with that Facebook ID.
+      // And then after that, then our express server will generate a JSON web token and then return the JSON web token to our client.
+      // All subsequent accesses from our user will have to include this JSON web token that we have just returned by using this approach.
+      // So at this point you no longer need the Facebook access token anymore.
+      // You can discard the Facebook access token at this point because the JSON web token is the one that keeps the users authentication active for whatever duration that this JSON web token is active.
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: true,
+        token: token,
+        status: "You are successfully logged in!",
+      });
+    }
+  }
+);
 module.exports = router;
+
+// The user application, the client in this case, will pass in the Facebook access token that it has just obtained from Facebook.
+// And then our express server will then use the Facebook access token to verify the user on Facebook.
+// And then if the user is acknowledged by Facebook to be a legitimate user, then our express server will return a JSON wed token to our client.
+// And then our client is authenticated and then can proceed forward with carrying out the other operations using the JSON wed token in the header of all the request messages, subsequently, just like we did with the local authentication strategy.

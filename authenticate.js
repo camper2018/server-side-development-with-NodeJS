@@ -9,6 +9,7 @@ var JwtStrategy = require("passport-jwt").Strategy;
 // This will provide us with a JSON Web Token based strategy for configuring our passport module.
 var ExtractJwt = require("passport-jwt").ExtractJwt;
 var jwt = require("jsonwebtoken");
+var FacebookTokenStrategy = require("passport-facebook-token");
 var config = require("./config");
 exports.local = passport.use(new LocalStrategy(User.authenticate()));
 // Since we are using passport mongoose plugin, the mongoose plugin itself adds this function called user.authenticate to the user schema and model.
@@ -113,3 +114,41 @@ exports.verifyAdmin = (req, res, next) => {
 //   })
 // );
 // exports.verifyAdmin = passport.authenticate("jwt", { session: false });
+
+// we will configure our application to either create a user or find the user based on the Facebook ID
+exports.facebookPassport = passport.use(
+  new FacebookTokenStrategy(
+    {
+      // get the clientId and clientSecret from config.js file
+      clientID: config.facebook.clientId,
+      clientSecret: config.facebook.clientSecret,
+    },
+    // So these are the four parameters that come into the following callback function
+    (accessToken, refreshToken, profile, done) => {
+      User.findOne({ facebookId: profile.id }, (err, user) => {
+        if (err) {
+          return done(err, fslse);
+        }
+        if (!err && user !== null) {
+          // if this particular Facebook user has logged in earlier so the account would already be configured with the facebookId and user will not be null
+          return done(null, user);
+        } else {
+          // if the user is logging for the first time, user will not exists in db so will create the user
+          //This user facebook profile object, will carry a lot of information coming from Facebook that we can use within our application.
+          // The accessToken, of course, is supplied to the server by the user.
+          user = new User({ username: profile.displayName });
+          user.facebookId = profile.id;
+          user.firstname = profile.name.givenName;
+          user.lastname = profile.name.familyName;
+          user.save((err, user) => {
+            if (err) {
+              return done(err, false);
+            } else {
+              return done(null, user);
+            }
+          });
+        }
+      });
+    }
+  )
+);

@@ -5,4 +5,9 @@ module.exports = {
   // secret key will be used for signing JSON Web Token
   secretKey: "12345-67890-09876-54321",
   mongoUrl: "mongodb://localhost:27017/conFusion",
+  //Enter appId and secret here,These must be used with https protocol.
+  facebook: {
+    clientId: "************",
+    clientSecret: "*********************",
+  },
 };
