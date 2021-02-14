@@ -31,11 +31,11 @@ favoriteRouter
 
   .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     // Get the user's favorites list
-    Favorite.find({ user: req.user._id })
+    Favorite.findOne({ user: req.user._id })
       .then(
         (fav) => {
           // if favorites doc not found for the user, then create it with dishes.
-          if (!fav[0]) {
+          if (fav == null) {
             Favorite.create({ user: req.user._id, dishes: req.body }).then(
               (fav) => {
                 res.statusCode = 200;
@@ -47,11 +47,12 @@ favoriteRouter
             // Otherwise, add the dishes to the favorites if not already exists.
           } else {
             req.body.forEach((dish) => {
-              if (fav[0].dishes.indexOf(dish._id) === -1) {
-                fav[0].dishes.push(dish._id);
+              if (fav.dishes.indexOf(dish._id) === -1) {
+                fav.dishes.push(dish._id);
               }
             });
-            fav[0].save().then(
+
+            fav.save().then(
               (response) => {
                 res.statusCode = 200;
                 res.setHeader("Content-Type", "application/json");
