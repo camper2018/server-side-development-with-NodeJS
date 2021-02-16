@@ -9,6 +9,14 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 /* GET users listing. */
+
+// Sometimes a post request with the login will send the options first to check, especially with cors,
+// whether the post request will be allowed or not
+// by sending status 200 in response to options, we simply allow any request (GET, POST, DELETE, UPDATE)
+// for all endpoints under /users if we receive options there.
+router.options("*", cors.corsWithOptions, (req, res) => {
+  res.sendStatus(200);
+});
 router.get(
   "/",
   cors.corsWithOptions,
@@ -75,25 +83,68 @@ router.post("/signup", cors.corsWithOptions, (req, res, next) => {
 router.post(
   "/login",
   cors.corsWithOptions,
-  passport.authenticate("local"),
+  //In the login function, we have simply define passport.authenticate local here
+  // Now, this passport.authenticate local, if the user doesn't get authenticated, it simply returns an unauthorized in the reply message.
+  // That may not be very meaningful for the client side to display this information,
+  // so that is why we will enhance this router post login method such that the authentication will return more meaningful information at this point.
+  // We will remove the passport.authenticate("local") line and update our function as:
+
+  // passport.authenticate("local"),
   (req, res, next) => {
-    var token = authenticate.getToken({ _id: req.user._id });
-    // The user ID is sufficient enough here as a payload, to search in the MongoDB for the user.
-    // If we choose to, we can include other parts of the user information as well here, but I would suggest that keep the JsonWebToken as small as possible.
-    // Now, we know that the req.user would be already present, because when the passport.authenticate('local') successfully authenticates the user, this is going to load up the user property onto the request message.
-    // We will add passport.authenticate("local") as a second middleware here.
-    // So when the router post comes in on the login endpoint, we will first call the passport authenticate local.
-    // If this is successful then this will come in and the next function that follows will be executed.
-    // If there is any error in the authentication, this passport authenticate local will automatically send back a reply to the client about the failure of the authentication.
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.json({
-      success: true,
-      token: token,
-      status: "You are successfully logged in!",
-    });
+    passport.authenticate("local", (err, user, info) => {
+      // The err will be returned when there is a genuine error that occurs during the authentication process,
+      // but the info will contain information if the user doesn't exist or either the username is incorrect or the password is incorrect and so on.
+      if (err) return next(err);
+      if (!user) {
+        // if user is null/ doesn't exists
+        res.statusCode = 401;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: false,
+          status: "Login Unsuccessful!",
+          err: info,
+        });
+      }
+      // note that the above situation will occur if either the username and the password is incorrect,
+      // and so this is not an error in the error sense but the fact that the authenticate could not find either the user or the password of the user is incorrect.
+      // So, that information will be encoded into the info that comes in and so that we will pass back as an error to our client side.
+      // If user exists, the passport.authenticate will add this method called req.logIn to the user.
+      // So, at this point, we will just simply pass in the user object that we've obtained.
+
+      req.logIn(user, (err) => {
+        if (err) {
+          res.statusCode = 401;
+          res.setHeader("Content-Type", "application/json");
+          res.json({
+            success: false,
+            status: "Login Unsuccessful!",
+            err: "Could not log in user!",
+          });
+        }
+        // So here, if we have reached this point, then that means that the user object is not null and also no error occurred,
+        // so that means that the user can be logged in and we would be able to generate the token.
+        // So, we'll generate the token based upon the user's ID, and then we'll pass back the token back to the user.
+        var token = authenticate.getToken({ _id: req.user._id });
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: true,
+          status: "Login Successful!",
+          token: token,
+        });
+      });
+    })(req, res, next);
   }
+  // the reason why we do a more elaborate way of handling passport.authentication is that
+  // we want to distinguish between the situation where a genuine error occurs during the authentication process as opposed to the situation where the user name is invalid or the password is invalid.
+  // So, those two cases will be handled by this situation, where the info will carry the information back to the client.
 );
+// In addition, we will add in one more method or endpoint below called checkJWTToken. See at the bottom
+// It is quite possible that while the client has logged in and obtain the JSON Web Token,
+// sometime later, the JSON Web Token may expire.
+// So, if the user tries to access from the client side with an expired token to the server, then the server will not be able to authenticate the user.
+// So, at periodic intervals, we may wish to cross-check to make sure that the JSON Web Token is still valid.
+
 router.get("/logout", cors.corsWithOptions, (req, res) => {
   if (req.session) {
     req.session.destroy();
@@ -135,6 +186,23 @@ router.get(
     }
   }
 );
+// So, if you do a get to the checkJWTToken after including the token into the authorization header once the user is logged in,
+// then this call will return a true or false to indicate to you whether the JSON Web Token is still valid or not.
+// If it is not valid, then the client-side can initiate another login for the user to obtain a new JSON Web Token if required.
+router.get("/checkJWTToken", cors.corsWithOptions, (req, res) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      res.statusCode = 401; // unauthorized
+      res.setHeader("Content-Type", "application/json");
+      return res.json({ status: "JWT invalid!", success: false, err: info });
+    } else {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      return res.json({ status: "JWT valid!", success: true, user: user });
+    }
+  })(req, res);
+});
 module.exports = router;
 
 // The user application, the client in this case, will pass in the Facebook access token that it has just obtained from Facebook.

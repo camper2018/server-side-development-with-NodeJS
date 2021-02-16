@@ -14,7 +14,8 @@ promoRouter
     res.sendStatus(200);
   })
   .get(cors.cors, (req, res, next) => {
-    Promotions.find({})
+    // Promotions.find({})
+    Promotions.find(req.query) // will provide query param featured=true
       .then(
         (promos) => {
           res.statusCode = 200;
