@@ -6,7 +6,9 @@ const app = express();
 const whitelist = [
   "http://localhost:3000",
   "https://localhost:3443",
-  "http://Tania’s MacBook Pro:3001",
+
+  "http://localhost:3001",
+  // "http://Your computer's name:3001",
 ];
 var corsOptionsDelegate = (req, callback) => {
   var corsOptions;
