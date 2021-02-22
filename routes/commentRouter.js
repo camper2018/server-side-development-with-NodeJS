@@ -12,7 +12,7 @@ commentRouter
     res.sendStatus(200);
   })
   .get(cors.cors, (req, res, next) => {
-    Comments.find(req.query)
+    Comments.find(req.query) // i.e find by dishId in url as param.
       .populate("author")
       .then(
         (comments) => {
@@ -28,7 +28,7 @@ commentRouter
     if (req.body !== null) {
       // that means there is comment inside the req.body
       req.body.author = req.user._id; // id of currently logged in user (verified by verifyUser)
-      // req.body already carries dish, comment message and rating and we added author as well ,
+      // req.body already carries dish(passed in as dishId at client side), comment message and rating and we added author as well ,
       // now we can add the comment to the db.
       Comments.create(req.body)
         .then(
@@ -81,6 +81,7 @@ commentRouter
     res.sendStatus(200);
   })
   .get(cors.cors, (req, res, next) => {
+    // We'll find the specific comment, and then return that comment.
     Comments.findById(req.params.commentId)
       .populate("author")
       .then(
@@ -104,11 +105,12 @@ commentRouter
       .then(
         (comment) => {
           if (comment != null) {
+            // Only the current user who is logged in- if the user is the same as the comments author, then the user will be allowed to update.
             if (!comment.author.equals(req.user._id)) {
               var err = new Error(
                 "You are not authorized to update this comment!"
               );
-              err.status = 403;
+              err.status = 403; // Unauthorized
               return next(err);
             }
             req.body.author = req.user._id;
@@ -131,6 +133,7 @@ commentRouter
                 (err) => next(err)
               );
           } else {
+            // if comment is null, that means that we did not find the comment in there, so we cannot modify a non-existent comment.
             err = new Error("Comment " + req.params.commentId + " not found!");
             err.status = 404;
             next(err);
@@ -145,11 +148,13 @@ commentRouter
       .then(
         (comment) => {
           if (comment != null) {
+            // comment is found
             if (!comment.author.equals(req.user._id)) {
+              // if comment author is not same as user requesting to delete
               var err = new Error(
                 "You are not authorized to delete this comment!"
               );
-              err.status = 403;
+              err.status = 403; // unauthorized
               return next(err);
             }
             Comments.findByIdAndRemove(req.params.commentId)
@@ -163,6 +168,7 @@ commentRouter
               )
               .catch((err) => next(err));
           } else {
+            // if comment not found
             err = new Error("Comment " + req.params.commentId + " not found!");
             err.status = 404;
             return next(err);

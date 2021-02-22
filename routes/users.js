@@ -96,8 +96,8 @@ router.post(
       // but the info will contain information if the user doesn't exist or either the username is incorrect or the password is incorrect and so on.
       if (err) return next(err);
       if (!user) {
-        // if user is null/ doesn't exists
-        res.statusCode = 401;
+        // if user is null/ doesn't exists i.e either username or password is incorrect.
+        res.statusCode = 401; // Unauthorized
         res.setHeader("Content-Type", "application/json");
         res.json({
           success: false,
